@@ -28,6 +28,7 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+/backend/.env
 
 # vercel
 .vercel
@@ -45,3 +46,6 @@ next-env.d.ts
 # config riles
 *.mjs
 *.json.backup
+
+# Ignore Firebase service account key
+/backend/firebase-service-key.json
