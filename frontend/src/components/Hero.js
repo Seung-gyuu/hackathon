@@ -58,14 +58,10 @@ export default function Hero() {
       {/* mid contents */}
       <div className="w-full relative z-10 rounded-xl px-8 py-12 max-w-3xl flex flex-col  items-center justify-center">
         {/* Heading */}
-        {/* <h1
-          className={`text-[6rem] font-bold text-neutralDark ${fugaz.className}`}
-        > */}
         <h1
-          className={`text-[3rem] font-bold text-neutralDark ${fugaz.className}`}
+          className={`text-[5rem] font-bold text-neutralDark ${fugaz.className}`}
         >
-          {/* NEXT STOP, */}
-          NEXT STOP, Your Adventure Awaits
+          NEXT STOP,
         </h1>
 
         {/* Sub */}
@@ -85,6 +81,7 @@ export default function Hero() {
             color="neutralDark"
             dark={false}
             font="fugaz"
+            href="/planning/purpose"
           />
           <Button
             text="Random Trip"

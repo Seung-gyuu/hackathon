@@ -2,18 +2,20 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Tailwind CSS Colors  */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: theme(colors.neutralLight);
+  --foreground: theme(colors.neutralDark);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: theme(colors.neutralLight);
+    --foreground: theme(colors.neutralDark);
   }
 }
 
+/* 기본 body 스타일 */
 body {
   color: var(--foreground);
   background: var(--background);

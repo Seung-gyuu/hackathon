@@ -1,17 +1,9 @@
 import { Fugaz_One } from "next/font/google";
+import Link from "next/link";
 import React from "react";
 
 const fugaz = Fugaz_One({ subsets: ["latin"], weight: ["400"] });
 
-/**
- * Reusable Button Component
- * @param {string} text - Button text
- * @param {string} color - Button color (primary | secondary | neutralDark | neutralLight)
- * @param {boolean} dark - Dark mode for button
- * @param {boolean} full - Full width button
- * @param {string} font - Font choice (geistSans | geistMono | fugaz)
- * @param {function} clickHandler - Click handler
- */
 export default function Button({
   text,
   color = "primary",
@@ -19,6 +11,7 @@ export default function Button({
   full = false,
   font = "fugaz",
   clickHandler,
+  href,
 }) {
   const fontStyles = {
     geistSans: "var(--font-geist-sans)",
@@ -39,16 +32,31 @@ export default function Button({
     neutralDark: dark
       ? "bg-neutralDark text-neutralLight border-neutralDark hover:bg-neutralLight hover:text-neutralDark"
       : "bg-neutralLight text-neutralDark border-neutralDark hover:bg-neutralDark hover:text-neutralLight",
+    neutralDarkLight: dark
+      ? "bg-neutralDarkLight text-neutralLight border-neutralDarkLight hover:bg-neutralLight hover:text-neutralDarkLight"
+      : "bg-neutralLight text-neutralDarkLight border-neutralDarkLight hover:bg-neutralDarkLight hover:text-neutralLight",
   };
 
+  const buttonClass = `
+    rounded-2xl overflow-hidden duration-200 border-2 border-solid
+    text-center flex items-center justify-center px-6 py-2 text-lg font-bold break-words
+    ${fontStyles[font]} ${colorStyles[color]}
+    ${full ? "w-full" : "w-auto"}
+  `;
+
+  // ✅ `href`가 있는 경우 `Link` 사용
+  if (href) {
+    return (
+      <Link href={href} className={buttonClass}>
+        {text}
+      </Link>
+    );
+  }
+
+  // ✅ 일반 버튼
   return (
-    <button
-      onClick={clickHandler}
-      className={`rounded-2xl overflow-hidden duration-200 border-2 border-solid 
-        text-center flex items-center justify-center ${colorStyles[color]} w-full px-6 py-2 text-lg font-bold break-words 
-        ${fontStyles[font]} `}
-    >
-      <p className="text-center break-words">{text}</p>
+    <button onClick={clickHandler} className={buttonClass}>
+      {text}
     </button>
   );
 }
