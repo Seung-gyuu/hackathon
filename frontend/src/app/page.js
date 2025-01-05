@@ -1,58 +1,114 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 
-export default function Home() {
-  const [ingredients, setIngredients] = useState("");
-  const [result, setResult] = useState("");
-  const [loading, setLoading] = useState(false);
+export default function TravelQuestionnaire() {
+  const [questions, setQuestions] = useState([]);
+  const [answers, setAnswers] = useState([]);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
 
-  const fetchRecipes = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      const response = await fetch("/api/recipe", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ ingredients }),
-      });
-      const data = await response.json();
-      setResult(data.result);
-    } catch (error) {
-      setResult("Error fetching recipes. Please try again.");
+  useEffect(() => {
+    const fetchQuestions = async () => {
+      try {
+        const questionKeys = [
+          "activities",
+          "budget",
+          "climate",
+          "companion",
+          "travel_duration",
+          "travel_purpose",
+          "travel_style",
+        ];
+
+        const questionsData = await Promise.all(
+          questionKeys.map(async (key) => {
+            const response = await fetch(
+              `http://localhost:3001/api/get-options/${key}`
+            );
+            if (!response.ok) {
+              const errorData = await response.json();
+              console.error(`Error for question ${key}:`, errorData.error);
+              throw new Error(`Failed to fetch options for question: ${key}`);
+            }
+            const data = await response.json();
+            return { questionKey: key, ...data };
+          })
+        );
+
+        setQuestions(questionsData);
+      } catch (error) {
+        console.error("Error fetching questions:", error);
+      }
+    };
+
+    fetchQuestions();
+  }, []);
+
+  const handleAnswer = async (answer) => {
+    const updatedAnswers = [...answers, answer];
+    setAnswers(updatedAnswers);
+
+    if (currentQuestionIndex < questions.length - 1) {
+      setCurrentQuestionIndex((prev) => prev + 1);
+    } else {
+      alert("Questionnaire complete!");
+      console.log("Final Answers before saving:", updatedAnswers);
+
+      const questionKeys = questions.map((q) => q.questionKey);
+      const finalAnswers = questionKeys.reduce((acc, key, index) => {
+        acc[key] = updatedAnswers[index] || "Not provided";
+        return acc;
+      }, {});
+
+      console.log("Final Answers for saving:", finalAnswers);
+
+      try {
+        const response = await fetch("http://localhost:3001/api/save-answers", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            answers: finalAnswers,
+          }),
+        });
+
+        if (response.ok) {
+          alert("Answers saved successfully!");
+          const data = await response.json();
+          console.log("Response from server:", data);
+        } else {
+          console.error("Failed to save answers:", await response.text());
+        }
+      } catch (error) {
+        console.error("Error saving answers:", error);
+      }
     }
-    setLoading(false);
   };
 
+  const currentQuestion = questions[currentQuestionIndex];
+
+  if (!currentQuestion) {
+    return <p>Loading question...</p>;
+  }
+
   return (
-    <main className="flex flex-col items-center justify-center min-h-screen">
-      <h1 className="text-center font-bold text-4xl my-6">
-        🍽️ Fridge to Plate 🍽️
-      </h1>
-      <form className="mt-4" onSubmit={fetchRecipes}>
-        <input
-          type="text"
-          value={ingredients}
-          onChange={(e) => setIngredients(e.target.value)}
-          placeholder="Enter ingredients"
-          className="border p-2 rounded"
-        />
-        <button
-          type="submit"
-          className="ml-2 p-2 bg-blue-500 text-white rounded"
-          disabled={loading}
-        >
-          {loading ? "Cooking..." : "Go"}
-        </button>
-      </form>
-      {result && (
-        <div className="mt-6 p-4 border rounded">
-          <h2 className="text-lg font-bold">Recipes:</h2>
-          <p>{result}</p>
-        </div>
-      )}
-    </main>
+    <div>
+      <h1>{currentQuestion.question}</h1>
+      <ul>
+        {currentQuestion.options.map((option, idx) => (
+          <li
+            key={idx}
+            onClick={() => handleAnswer(option)}
+            style={{ cursor: "pointer" }}
+          >
+            {option}
+          </li>
+        ))}
+      </ul>
+      <p>
+        Question {currentQuestionIndex + 1} of {questions.length}
+      </p>
+    </div>
   );
 }
