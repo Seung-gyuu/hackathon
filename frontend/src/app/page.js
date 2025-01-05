@@ -1,10 +1,11 @@
 "use client";
+import RandomPlanner from "@/components/RandomPlanner";
+import NavBar from "@/components/NavBar";
 export default function Home() {
   return (
     <main>
-      <h2 className="text-center font-bold uppercase text-4xl my-6">
-       Hello World
-      </h2>
+      <NavBar />
+      <RandomPlanner />
     </main>
   );
 }
