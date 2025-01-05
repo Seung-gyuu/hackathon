@@ -12,6 +12,7 @@ export default function PlanningLayout({
   currentStep,
   isFinal = false,
   isNextDisabled = false,
+  onResults, // ✅ 결과 저장 핸들러 추가
 }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -54,40 +55,6 @@ export default function PlanningLayout({
     }
   };
 
-  const handleResults = async () => {
-    try {
-      const userSelections = {
-        travel_purpose: localStorage.getItem("selectedPurpose") || null,
-        travel_style: localStorage.getItem("selectedStyle") || null,
-        activities: localStorage.getItem("selectedActivity") || null,
-        budget: localStorage.getItem("selectedBudget") || null,
-        climate: localStorage.getItem("selectedWeather") || null,
-        companion: localStorage.getItem("selectedCompanion") || null,
-        travel_duration: localStorage.getItem("selectedDuration") || null,
-      };
-
-      const filteredSelections = Object.fromEntries(
-        Object.entries(userSelections).filter(([_, value]) => value !== null)
-      );
-
-      const docRef = await addDoc(
-        collection(db, "user_selections"),
-        filteredSelections
-      );
-      console.log("Document written with ID: ", docRef.id);
-
-      // reset localStorage
-      Object.keys(userSelections).forEach((key) =>
-        localStorage.removeItem(key)
-      );
-
-      router.push("/result");
-    } catch (error) {
-      console.error("Error saving data to Firestore:", error);
-      alert("Failed to save data. Please try again.");
-    }
-  };
-
   useEffect(() => {
     if (!pathname.startsWith("/planning")) {
       const keysToClear = Object.values(pageStorageKeys);
@@ -108,16 +75,18 @@ export default function PlanningLayout({
         ></progress>
       </div>
 
+      {/* Main Content */}
       <div className="mb-8">{children}</div>
 
-      {/* Navigation Buttons */}
-      <NavigationButtons
-        onBack={handleBack}
-        onNext={handleNext}
-        onResults={handleResults}
-        isFinal={isFinal}
-        isNextDisabled={isNextDisabled}
-      />
+      {/* Navigation Buttons (isFinal이 false일 때만 렌더링) */}
+      {!isFinal && (
+        <NavigationButtons
+          onBack={handleBack}
+          onNext={handleNext}
+          isFinal={isFinal}
+          isNextDisabled={isNextDisabled}
+        />
+      )}
     </div>
   );
 }

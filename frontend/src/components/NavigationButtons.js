@@ -4,7 +4,7 @@ import Button from "./Button";
 export default function NavigationButtons({
   onBack,
   onNext,
-  onResults,
+  onResults, // ✅ 결과 버튼 핸들러
   isFinal = false,
   isBackDisabled = false,
   isNextDisabled = false, // ✅ 다음 버튼 비활성화 여부
@@ -21,11 +21,11 @@ export default function NavigationButtons({
         font="geistSans"
       />
 
-      {/* Next Button */}
+      {/* Next / Save and View Results Button */}
       <Button
-        text={isFinal ? "View Results" : "Next"}
+        text={isFinal ? "Save and View Results" : "Next"}
         color={isFinal ? "third" : "primary"}
-        clickHandler={isFinal ? onResults : onNext}
+        clickHandler={isFinal ? onResults : onNext} // ✅ 최종 페이지일 때 onResults 실행
         full
         disabled={isNextDisabled}
         font="geistSans"

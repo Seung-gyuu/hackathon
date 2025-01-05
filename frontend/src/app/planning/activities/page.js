@@ -3,7 +3,7 @@ import PlanningLayout from "@/components/PlanningLayout";
 import SelectionItem from "@/components/SelectionItem";
 import { useEffect, useState } from "react";
 import { db } from "@/firebase";
-import { doc, getDoc, collection, addDoc } from "firebase/firestore";
+import { doc, getDoc, addDoc, collection } from "firebase/firestore";
 import { useRouter } from "next/navigation";
 
 export default function Activities() {
@@ -39,7 +39,6 @@ export default function Activities() {
   const handleSelectOption = (option) => {
     setSelectedOption(option);
     localStorage.setItem("selectedActivity", option);
-    console.log(`Selected: ${option}`);
   };
 
   const handleSaveToFirestore = async () => {
@@ -63,38 +62,24 @@ export default function Activities() {
         collection(db, "user_selections"),
         filteredSelections
       );
+
       console.log("Document written with ID: ", docRef.id);
 
-      Object.keys(userSelections).forEach((key) =>
-        localStorage.removeItem(key)
-      );
-
-      const router = useRouter();
-      router.push("/result");
+      router.push(`/result?id=${docRef.id}`);
     } catch (error) {
       console.error("Error saving data to Firestore:", error);
       alert("Failed to save data. Please try again.");
     }
   };
 
-  if (loading) {
-    return <p>Loading...</p>;
-  }
-
-  if (!activityData) {
-    return <p>No data available</p>;
-  }
-
   return (
     <PlanningLayout
-      title="7. Select Your Activities"
+      title="Select Your Activities"
       currentStep={7}
       isFinal={true}
-      onResults={handleSaveToFirestore}
-      isNextDisabled={!selectedOption}
     >
       <div className="grid grid-cols-2 gap-4">
-        {activityData.options?.map((option, index) => (
+        {activityData?.options?.map((option, index) => (
           <SelectionItem
             key={index}
             title={option}
@@ -102,6 +87,17 @@ export default function Activities() {
             onSelect={() => handleSelectOption(option)}
           />
         ))}
+      </div>
+
+      {/* ✅ Save and View Results 버튼 */}
+      <div className="flex justify-end mt-6">
+        <button
+          onClick={handleSaveToFirestore}
+          className="px-4 py-2 text-white rounded-md bg-primary"
+          disabled={!selectedOption}
+        >
+          Save and View Results
+        </button>
       </div>
     </PlanningLayout>
   );
