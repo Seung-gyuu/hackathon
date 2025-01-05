@@ -6,24 +6,24 @@ const fugaz = Fugaz_One({ subsets: ["latin"], weight: ["400"] });
 
 export default function Hero() {
   return (
-    <div className="w-full flex flex-col items-center justify-center text-center px-4 relative overflow-hidden min-h-screen">
+    <div className="relative flex flex-col items-center justify-center w-full h-full px-4 overflow-hidden text-center">
       {/* 1. Map w route */}
-      {/* <div className="absolute top-16 left-24 w-full h-full">
+      {/* <div className="absolute w-full h-full top-16 left-24">
         <Image
           src="/images/travel-7.png"
           alt="Left Travel Image"
           layout="fill"
           objectFit="contain"
-          className="object-cover filter grayscale opacity-50"
+          className="object-cover opacity-50 filter grayscale"
           priority
         />
       </div> */}
 
       {/* 2. planes w dot line */}
-      <div className="absolute top-0 left-24 w-full h-screen">
+      <div className="absolute inset-0 flex items-center justify-center w-full h-full overflow-hidden -z-10">
         <Image
           src="/images/travel-9.png"
-          alt="Left Travel Image"
+          alt="Background Image"
           layout="fill"
           objectFit="contain"
           className="object-cover filter grayscale opacity-20"
@@ -32,19 +32,19 @@ export default function Hero() {
       </div>
 
       {/* 3. Direction Sign */}
-      {/* <div className="absolute top-6 left-44 w-1/3 h-full transform -rotate-12">
+      {/* <div className="absolute w-1/3 h-full transform top-6 left-44 -rotate-12">
         <Image
           src="/images/travel-11.png"
           alt="Left Travel Image"
           layout="fill"
           objectFit="contain"
-          className="object-cover filter grayscale opacity-50"
+          className="object-cover opacity-50 filter grayscale"
           priority
         />
       </div> */}
 
       {/* 4. Airplane */}
-      {/* <div className="absolute top-10 right-16 w-1/4 h-full opacity-40 transform -rotate-12">
+      {/* <div className="absolute w-1/4 h-full transform top-10 right-16 opacity-40 -rotate-12">
         <Image
           src="/images/travel-1.png"
           alt="Right Travel Image"
@@ -56,7 +56,7 @@ export default function Hero() {
       </div> */}
 
       {/* mid contents */}
-      <div className="w-full relative z-10 rounded-xl px-8 py-12 max-w-3xl flex flex-col  items-center justify-center">
+      <div className="relative z-10 flex flex-col items-center justify-center w-full rounded-xl">
         {/* Heading */}
         <h1
           className={`text-[5rem] font-bold text-neutralDark ${fugaz.className}`}
@@ -65,17 +65,23 @@ export default function Hero() {
         </h1>
 
         {/* Sub */}
-        <div className="my-6 w-full">
-          <h2 className="text-3xl font-semibold text-neutralDark">
+        <div className="w-full my-6">
+          <h2
+            // className={`text-3xl font-semibold text-neutralDark ${fugaz.className}`}
+            className="text-3xl font-bold text-neutralDark/80"
+          >
             Your Perfect Getaway
           </h2>
-          <p className="text-lg text-neutralDark opacity-70 mt-2">
+          <p
+            // className={`mt-2 text-lg text-neutralDark opacity-70 ${fugaz.className}`}
+            className="mt-1 text-md text-neutralDark/80 "
+          >
             Plan Smart, Travel Freely, Made by Your Choice
           </p>
         </div>
 
         {/* Buttons */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-8 mt-8 w-3/5">
+        <div className="flex flex-col items-center justify-center w-3/5 gap-8 mt-8 sm:flex-row">
           <Button
             text="Planning Trip"
             color="neutralDark"
