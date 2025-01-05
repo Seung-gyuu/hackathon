@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Tailwind CSS Colors  */
+/* Tailwind CSS Colors */
 :root {
   --background: theme(colors.neutralLight);
   --foreground: theme(colors.neutralDark);
@@ -24,11 +24,9 @@ body {
 }
 
 .container {
-  max-width: 1366px;
-  min-height: 100vh;
-  margin: 0 auto;
-  padding: 0 60px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+  @apply max-w-screen-xl mx-auto px-4 md:px-6;
+}
+
+.page-transition {
+  @apply transition-opacity duration-500 ease-in-out;
 }

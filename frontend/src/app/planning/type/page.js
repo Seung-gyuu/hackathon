@@ -4,6 +4,7 @@ import SelectionItem from "@/components/SelectionItem";
 import { useEffect, useState } from "react";
 import { db } from "@/firebase";
 import { doc, getDoc } from "firebase/firestore";
+import BasicLoading from "@/components/basicLoading";
 // import { styleData } from "@/data/planningData";
 
 export default function Type() {
@@ -12,6 +13,12 @@ export default function Type() {
   const [selectedOption, setSelectedOption] = useState(
     () => localStorage.getItem("selectedTravelStyle") || null
   );
+
+  const icons = [
+    "/images/plan-2-1.png",
+    "/images/plan-2-2.png",
+    "/images/plan-2-3.png",
+  ];
 
   useEffect(() => {
     const fetchTravelStyleData = async () => {
@@ -28,6 +35,7 @@ export default function Type() {
         console.error("Error fetching travel style data:", error);
       } finally {
         setLoading(false);
+        // setTimeout(() => setLoading(false), 1000);
       }
     };
 
@@ -43,7 +51,7 @@ export default function Type() {
   console.log("travelStyleData", travelStyleData);
 
   if (loading) {
-    return <p>Loading...</p>;
+    return <BasicLoading />;
   }
 
   if (!travelStyleData) {
@@ -56,11 +64,12 @@ export default function Type() {
       currentStep={2}
       isNextDisabled={!selectedOption}
     >
-      <div className="grid grid-cols-2 gap-4">
+      <div className="flex flex-col items-center justify-between w-full gap-4 md:flex-row">
         {travelStyleData.options?.map((option, index) => (
           <SelectionItem
             key={index}
             title={option}
+            icon={icons[index]}
             isSelected={selectedOption === option ? true : false}
             onSelect={() => handleSelectOption(option)}
           />

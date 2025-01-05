@@ -44,7 +44,6 @@ export default function Button({
     ${full ? "w-full" : "w-auto"}
   `;
 
-  // ✅ `href`가 있는 경우 `Link` 사용
   if (href) {
     return (
       <Link href={href} className={buttonClass}>
@@ -53,7 +52,6 @@ export default function Button({
     );
   }
 
-  // ✅ 일반 버튼
   return (
     <button onClick={clickHandler} className={buttonClass}>
       {text}

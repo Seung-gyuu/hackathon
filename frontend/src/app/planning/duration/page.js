@@ -4,6 +4,7 @@ import SelectionItem from "@/components/SelectionItem";
 import { useEffect, useState } from "react";
 import { db } from "@/firebase";
 import { doc, getDoc } from "firebase/firestore";
+import BasicLoading from "@/components/basicLoading";
 
 export default function Duration() {
   const [durationData, setDurationData] = useState(null);
@@ -27,6 +28,7 @@ export default function Duration() {
         console.error("Error fetching Duration data:", error);
       } finally {
         setLoading(false);
+        // setTimeout(() => setLoading(false), 1000);
       }
     };
 
@@ -42,7 +44,7 @@ export default function Duration() {
   console.log("durationData", durationData);
 
   if (loading) {
-    return <p>Loading...</p>;
+    return <BasicLoading />;
   }
 
   if (!durationData) {
@@ -55,7 +57,7 @@ export default function Duration() {
       currentStep={5}
       isNextDisabled={!selectedOption}
     >
-      <div className="grid grid-cols-2 gap-4">
+      <div className="flex flex-col items-center justify-between w-full gap-4 md:flex-row">
         {durationData.options?.map((option, index) => (
           <SelectionItem
             key={index}

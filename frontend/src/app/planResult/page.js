@@ -3,12 +3,14 @@ import { useEffect, useState } from "react";
 import { db } from "@/firebase";
 import { doc, getDoc } from "firebase/firestore";
 import { useSearchParams } from "next/navigation";
+import LoadingScreen from "@/components/LoadingScreen";
 
-export default function ResultPage() {
+export default function planResult() {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [result, setResult] = useState("");
   const searchParams = useSearchParams();
-  const documentId = searchParams.get("id"); // URL에서 ID 추출
+  const documentId = searchParams.get("id");
 
   useEffect(() => {
     const fetchResult = async () => {
@@ -19,7 +21,6 @@ export default function ResultPage() {
           return;
         }
 
-        // ✅ Firestore에서 Document ID로 데이터 조회
         const docRef = doc(db, "user_selections", documentId);
         const docSnap = await getDoc(docRef);
 
@@ -31,15 +32,48 @@ export default function ResultPage() {
       } catch (error) {
         console.error("Error fetching result:", error);
       } finally {
-        setLoading(false);
+        // setLoading(false);
+        setTimeout(() => setLoading(false), 5000);
       }
     };
-
     fetchResult();
   }, [documentId]);
 
+  // useEffect(() => {
+  //   const fetchResult = async () => {
+  //     const docID = documentId;
+
+  //     try {
+  //       const response = await fetch(`http://localhost:3001/api/chat`, {
+  //         method: "POST",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //         },
+  //         body: JSON.stringify({ docID }),
+  //       });
+
+  //       if (!response.ok) {
+  //         throw new Error("Failed to fetch result");
+  //       }
+
+  //       const data = await response.json();
+  //       setResult(data.result);
+  //     } catch (error) {
+  //       console.error("Error fetching result:", error);
+  //       setResult("Failed to load result.");
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   fetchResult();
+  // }, []);
+
+  // console.log("result", result);
+
   if (loading) {
-    return <p>Loading...</p>;
+    // return <BasicLoading />;
+    return <LoadingScreen />;
   }
 
   if (!userData) {
@@ -47,7 +81,7 @@ export default function ResultPage() {
   }
 
   return (
-    <div>
+    <div className="flex flex-col items-center justify-center flex-1 h-[calc(100vh-8rem)] container">
       <h1>Your Travel Plan</h1>
       <ul>
         <li>
