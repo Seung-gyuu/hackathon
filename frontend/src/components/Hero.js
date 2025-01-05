@@ -94,6 +94,7 @@ export default function Hero() {
             color="neutralDark"
             dark={false}
             font="fugaz"
+            href="/random"
           />
         </div>
       </div>
