@@ -1,21 +1,38 @@
 @tailwind base;
 @tailwind components;
+<<<<<<< HEAD
+@tailwind utilities; 
+=======
 @tailwind utilities;
 
+/* Tailwind CSS Colors  */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: theme(colors.neutralLight);
+  --foreground: theme(colors.neutralDark);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: theme(colors.neutralLight);
+    --foreground: theme(colors.neutralDark);
   }
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
+  max-width: 100vw;
+  overflow-x: hidden;
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.container {
+  max-width: 1366px;
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 0 60px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+>>>>>>> 8d0f99749d31b5f5544f5956ed065b5faaa42d7c
