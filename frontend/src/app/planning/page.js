@@ -28,5 +28,5 @@ export default function PlanningPage() {
     router.push("/planning/purpose");
   }, [router]);
 
-  return;
+  return null;
 }

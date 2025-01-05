@@ -2,9 +2,11 @@
 import React, { useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { stepsData } from "@/data/planningData";
+import { IoMdCloseCircle } from "react-icons/io";
 import NavigationButtons from "./NavigationButtons";
 import { collection, addDoc } from "firebase/firestore";
 import { db } from "@/firebase";
+import ProgressBar from "./ProgressBar";
 
 export default function PlanningLayout({
   title,
@@ -12,15 +14,24 @@ export default function PlanningLayout({
   currentStep,
   isFinal = false,
   isNextDisabled = false,
-  onResults, // ✅ 결과 저장 핸들러 추가
 }) {
   const router = useRouter();
   const pathname = usePathname();
 
+  const steps = [
+    { label: "Purpose" },
+    { label: "Style" },
+    { label: "Weather" },
+    { label: "Budget" },
+    { label: "Duration" },
+    { label: "Companion" },
+    { label: "Activities" },
+  ];
+
   const prevStep =
     currentStep === 1 ? "/" : stepsData[currentStep - 2]?.path || "/planning";
   const nextStep = isFinal
-    ? "/result"
+    ? "/planResult"
     : stepsData[currentStep]?.path || "/planning";
 
   const pageStorageKeys = {
@@ -34,12 +45,6 @@ export default function PlanningLayout({
   };
 
   const handleBack = () => {
-    const currentStorageKey = pageStorageKeys[pathname];
-    if (currentStorageKey) {
-      localStorage.removeItem(currentStorageKey);
-      console.log(`${currentStorageKey} has been removed from localStorage`);
-    }
-
     if (currentStep === 1) {
       router.push("/");
     } else {
@@ -64,29 +69,37 @@ export default function PlanningLayout({
   }, [pathname]);
 
   return (
-    <div className="w-1/2 p-6 mx-auto">
-      {/* Progress Bar */}
-      <div className="mb-4">
-        <h2 className="mb-2 text-2xl font-bold">{title}</h2>
-        <progress
-          value={currentStep}
-          max={stepsData.length}
-          className="w-full"
-        ></progress>
+    <div className="flex flex-col items-center justify-center flex-1 h-[calc(100vh-8rem)] container">
+      <div className="flex flex-col justify-center w-full p-4 mx-auto md:p-6 lg:w-2/3">
+        {/* Title */}
+        <h1 className="flex items-center justify-center w-full mb-16 text-2xl font-bold md:text-4xl md:m-0">
+          {title}
+        </h1>
+
+        {/* Progress Bar */}
+        <div className="items-center justify-center hidden w-full h-full my-20 md:flex">
+          <ProgressBar
+            steps={steps}
+            currentStep={currentStep}
+            className="w-full"
+          />
+        </div>
+
+        {/* Main Content */}
+        <div className="flex flex-col items-center justify-center flex-1 mb-8">
+          {children}
+        </div>
+
+        {/* Navigation Buttons */}
+        {!isFinal ? (
+          <NavigationButtons
+            onBack={handleBack}
+            onNext={handleNext}
+            isFinal={isFinal}
+            isNextDisabled={isNextDisabled}
+          />
+        ) : null}
       </div>
-
-      {/* Main Content */}
-      <div className="mb-8">{children}</div>
-
-      {/* Navigation Buttons (isFinal이 false일 때만 렌더링) */}
-      {!isFinal && (
-        <NavigationButtons
-          onBack={handleBack}
-          onNext={handleNext}
-          isFinal={isFinal}
-          isNextDisabled={isNextDisabled}
-        />
-      )}
     </div>
   );
 }

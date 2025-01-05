@@ -4,6 +4,7 @@ import SelectionItem from "@/components/SelectionItem";
 import { useEffect, useState } from "react";
 import { db } from "@/firebase";
 import { doc, getDoc } from "firebase/firestore";
+import BasicLoading from "@/components/basicLoading";
 
 export default function Weather() {
   const [weatherData, setWeatherData] = useState(null);
@@ -27,6 +28,7 @@ export default function Weather() {
         console.error("Error fetching weather data:", error);
       } finally {
         setLoading(false);
+        // setTimeout(() => setLoading(false), 1000);
       }
     };
 
@@ -42,7 +44,7 @@ export default function Weather() {
   console.log("weatherData", weatherData);
 
   if (loading) {
-    return <p>Loading...</p>;
+    return <BasicLoading />;
   }
 
   if (!weatherData) {
@@ -54,7 +56,7 @@ export default function Weather() {
       currentStep={3}
       isNextDisabled={!selectedOption}
     >
-      <div className="grid grid-cols-2 gap-4">
+      <div className="flex flex-col items-center justify-between w-full gap-4 md:flex-row">
         {weatherData.options?.map((option, index) => (
           <SelectionItem
             key={index}

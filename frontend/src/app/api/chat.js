@@ -1,42 +1,59 @@
-import OpenAI from "openai";
-import { db } from "../../../backend/firebase";
+// const OpenAI = require("openai");
+// const { db } = require('./firebase'); 
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+// const openai = new OpenAI({
+//   apiKey: process.env.OPENAI_API_KEY,
+// });
 
-export default async function handler(req, res) {
-  try {
-    const { docID } = req.body;
+// export async function POST(req, res) {
+//   const docID = "9DFq1dRsAXhyd9o8RbOk"; 
 
-    if (!docID) {
-      return res.status(400).json({ error: "docID is required" });
-    }
+//   try {
+//     console.log(`Received docID: ${docID}`); 
 
-    const userDoc = await db.collection("user_selections").doc(docID).get();
-    const userInput = userDoc.data();
+//     // Fetch user data from Firestore using docID
+//     const userDoc = await db.collection('user_selections').doc(docID).get();
+//     if (!userDoc.exists) {
+//       console.error(`No data found for docID: ${docID}`); 
+//       return res.status(404).json({ error: 'User data not found' });
+//     }
 
-    const userSelections = `
-      Travel Purpose: ${userInput.travel_purpose}
-      Travel Style: ${userInput.travel_style}
-      Budget: ${userInput.budget}
-      Companion: ${userInput.companion}
-      Activities: ${userInput.activities}
-      Climate: ${userInput.climate}
-      Travel Duration: ${userInput.travel_duration}
-    `;
+//     const user_input = userDoc.data();
+//     console.log("Fetched user data:", user_input);
+//     // Format the user data into a prompt
+//     const user_selections = `
+//       Travel Purpose: ${user_input.travel_purpose}
+//       Travel Style: ${user_input.travel_style}
+//       Budget: ${user_input.budget}
+//       Companion: ${user_input.companion}
+//       Activities: ${user_input.activities}
+//       Climate: ${user_input.climate}
+//       Travel Duration: ${user_input.travel_duration}
+//     `;
+//     console.log("Formatted user data for AI:", user_selections); 
 
-    const aiResponse = await openai.chat.completions.create({
-      messages: [
-        { role: "user", content: userSelections },
-        { role: "system", content: "Generate travel recommendations based on preferences." },
-      ],
-      model: "gpt-4o",
-    });
+//     // Call OpenAI with the formatted user data
+//     const aiResponse = await openai.chat.completions.create({
+//       messages: [
+//         {
+//           role: "user",
+//           content: user_selections,
+//         },
+//         {
+//           role: "system",
+//           content: "Based on the following user preferences, recommend three countries or cities with a 3-day itinerary for each destination, and provide an image URL for each",
+//         },
+//       ],
+//       model: "gpt-4o", 
+//     });
 
-    res.status(200).json({ result: aiResponse.choices[0].message.content });
-  } catch (error) {
-    console.error("Error:", error);
-    res.status(500).json({ error: "Failed to generate recommendations." });
-  }
-}
+//     const result = aiResponse.choices[0].message.content;
+//     console.log("AI Result:", result); 
+
+//     // Return the result as a response
+//     return res.status(200).json({ result });
+//   } catch (error) {
+//     console.error('Error generating AI result:', error);
+//     return res.status(500).json({ error: error.message || 'Failed to generate result' });
+//   }
+// }

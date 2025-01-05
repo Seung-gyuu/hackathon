@@ -2,6 +2,26 @@ const express = require("express");
 const { db } = require("./firebase");
 
 const router = express.Router();
+// router.use("/chat", chat); // chat.js 파일을 사용하기 위한 라우터 설정
+
+const { getAIResponse } = require("./aiController");
+
+
+router.post("/chat", async (req, res) => {
+  const docID = "9DFq1dRsAXhyd9o8RbOk";
+  // const { docID } = req.body;
+
+  if (!docID) {
+    return res.status(400).json({ error: "docID is required" });
+  }
+
+  try {
+    const result = await getAIResponse(docID);
+    res.status(200).json({ result });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to generate AI response" });
+  }
+});
 
 router.post("/save-answers", async (req, res) => {
   try {
