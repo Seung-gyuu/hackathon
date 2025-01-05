@@ -1,7 +1,6 @@
 "use client";
 import PlanningLayout from "@/components/PlanningLayout";
 import SelectionItem from "@/components/SelectionItem";
-import { purposeData } from "@/data/planningData";
 import { useEffect, useState } from "react";
 import { db } from "@/firebase";
 import { doc, getDoc } from "firebase/firestore";
@@ -9,6 +8,9 @@ import { doc, getDoc } from "firebase/firestore";
 export default function Purpose() {
   const [purposeData, setPurposeData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [selectedOption, setSelectedOption] = useState(
+    () => localStorage.getItem("selectedPurpose") || null
+  );
 
   useEffect(() => {
     const fetchPurposeData = async () => {
@@ -31,7 +33,14 @@ export default function Purpose() {
     fetchPurposeData();
   }, []);
 
+  const handleSelectOption = (option) => {
+    setSelectedOption(option);
+    localStorage.setItem("selectedPurpose", option);
+    // console.log(`Selected: ${option}`);
+  };
+
   console.log("purposeData", purposeData);
+  console.log("selectedOption", selectedOption);
 
   if (loading) {
     return <p>Loading...</p>;
@@ -43,17 +52,18 @@ export default function Purpose() {
   return (
     <div>
       <PlanningLayout
-        title={purposeData.question || "Purpose Question"}
+        title="1. What is the purpose of your trip?"
         currentStep={1}
+        isNextDisabled={!selectedOption}
       >
         <div className="grid grid-cols-2 gap-4">
-          {purposeData.options?.map((option, id) => (
+          {purposeData.options?.map((option, index) => (
             <SelectionItem
-              key={id}
+              key={index}
               title={option}
               description=""
-              isSelected={false}
-              onSelect={() => console.log(`Selected: ${option}`)}
+              isSelected={selectedOption === option ? true : false}
+              onSelect={() => handleSelectOption(option)}
             />
           ))}
         </div>

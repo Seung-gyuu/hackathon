@@ -1,24 +1,13 @@
 import React from "react";
 import Button from "./Button";
 
-// export default function NavigationButtons({ onBack, onNext, isFinal }) {
-//   return (
-//     <div className="flex justify-between mt-8">
-//       <Button text="Back" color="neutralDark" onClick={onBack} />
-//       <Button
-//         text={isFinal ? "View Results" : "Next"}
-//         color="primary"
-//         onClick={onNext}
-//       />
-//     </div>
-//   );
-// }
-
 export default function NavigationButtons({
   onBack,
   onNext,
+  onResults,
   isFinal = false,
   isBackDisabled = false,
+  isNextDisabled = false, // ✅ 다음 버튼 비활성화 여부
 }) {
   return (
     <div className="flex justify-between gap-4 mt-8">
@@ -28,7 +17,6 @@ export default function NavigationButtons({
         color="neutralDarkLight"
         clickHandler={onBack}
         full
-        // dark
         disabled={isBackDisabled}
         font="geistSans"
       />
@@ -37,9 +25,9 @@ export default function NavigationButtons({
       <Button
         text={isFinal ? "View Results" : "Next"}
         color={isFinal ? "third" : "primary"}
-        clickHandler={onNext}
+        clickHandler={isFinal ? onResults : onNext}
         full
-        dark={isFinal}
+        disabled={isNextDisabled}
         font="geistSans"
       />
     </div>
