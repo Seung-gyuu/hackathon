@@ -4,6 +4,7 @@ import SelectionItem from "@/components/SelectionItem";
 import { useEffect, useState } from "react";
 import { db } from "@/firebase";
 import { doc, getDoc } from "firebase/firestore";
+import BasicLoading from "@/components/basicLoading";
 
 export default function Companion() {
   const [companionData, setCompanionData] = useState(null);
@@ -27,6 +28,7 @@ export default function Companion() {
         console.error("Error fetching Companion data:", error);
       } finally {
         setLoading(false);
+        // setTimeout(() => setLoading(false), 1000);
       }
     };
 
@@ -42,7 +44,7 @@ export default function Companion() {
   console.log("companionData", companionData);
 
   if (loading) {
-    return <p>Loading...</p>;
+    return <BasicLoading />;
   }
 
   if (!companionData) {
@@ -55,7 +57,7 @@ export default function Companion() {
       currentStep={6}
       isNextDisabled={!selectedOption}
     >
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid items-center justify-between w-full grid-cols-2 gap-4 md:h-48 md:flex md:flex-row">
         {companionData.options?.map((option, index) => (
           <SelectionItem
             key={index}
