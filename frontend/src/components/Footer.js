@@ -2,7 +2,7 @@ import { FaGithub, FaLinkedin, FaInstagram } from "react-icons/fa";
 
 export default function Footer() {
   return (
-    <div className="flex items-center justify-between w-full h-16 px-6 md:h-20 text-neutralDark/80">
+    <div className="fixed bottom-0 flex items-center justify-between w-full h-16 text-neutralDark/80">
       <div className="text-sm ">Brain Bubbles © 2025</div>
 
       <div className="flex items-center gap-8 ">
