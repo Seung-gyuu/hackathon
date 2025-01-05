@@ -6,7 +6,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: "http://localhost:3000", 
+    origin: "http://localhost:3000",
     methods: ["GET", "POST"],
     credentials: true,
   })
@@ -15,8 +15,10 @@ app.use(
 app.use(express.json());
 app.use("/api", userRoute);
 
-const PORT = process.env.PORT || 3001;
+// const PORT = process.env.PORT || 3001;
 
-app.listen(PORT, () => {
-  console.log(`Backend Server is running on http://localhost:${PORT}`);
-});
+// app.listen(PORT, () => {
+//   console.log(`Backend Server is running on http://localhost:${PORT}`);
+// });
+
+module.exports = app;
