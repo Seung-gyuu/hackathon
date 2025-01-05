@@ -52,7 +52,7 @@ const LoadingScreen = () => {
       </div>
 
       {/* Text Container*/}
-      <div className="text-center -mt-2">
+      <div className="text-center">
         <h2 className="text-2xl font-bold text-gray-800 mb-2">
           Welcome to {cities[currentImageIndex]}
         </h2>

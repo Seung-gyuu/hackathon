@@ -1,80 +1,76 @@
-// "use client";
-// import { useEffect, useState } from "react";
-// import { db } from "@/firebase";
-// import { doc, getDoc } from "firebase/firestore";
-// import { useSearchParams } from "next/navigation";
+"use client";
+import { useState, useEffect } from "react";
+import PlanCard from "@/components/PlanCard";
+import breakfastImage from "../../../public/img/result/breakfast-removebg-preview.png";
+import dinnerImage from "../../../public/img/result/dinner-removebg-preview.png";
+import hotspringImage from "../../../public/img/result/hotspring-removebg-preview.png";
+import summerImage from "../../../public/img/result/summer-removebg-preview.png";
+import winterImage from "../../../public/img/result/winter-removebg-preview.png";
+import CountryFlag, { countryToCode } from "@/components/CountryFlag";
 
-// export default function ResultPage() {
-//   const [userData, setUserData] = useState(null);
-//   const [loading, setLoading] = useState(true);
-//   const searchParams = useSearchParams();
-//   const documentId = searchParams.get("id"); // URL에서 ID 추출
+const originalImages = [
+  breakfastImage,
+  dinnerImage,
+  hotspringImage,
+  summerImage,
+  winterImage,
+];
 
-//   useEffect(() => {
-//     const fetchResult = async () => {
-//       try {
-//         if (!documentId) {
-//           console.warn("No document ID found in the URL.");
-//           setLoading(false);
-//           return;
-//         }
+export default function page() {
+  const [selectedBox, setSelectedBox] = useState(null);
+  const [shuffledImages, setShuffledImages] = useState(
+    originalImages.slice(0, 3)
+  );
+  const [shuffledCountries, setShuffledCountries] = useState([]);
 
-//         // ✅ Firestore에서 Document ID로 데이터 조회
-//         const docRef = doc(db, "user_selections", documentId);
-//         const docSnap = await getDoc(docRef);
+  useEffect(() => {
+    const shuffledImgs = [...originalImages]
+      .map((value) => ({ value, sort: Math.random() }))
+      .sort((a, b) => a.sort - b.sort)
+      .map(({ value }) => value)
+      .slice(0, 3);
 
-//         if (docSnap.exists()) {
-//           setUserData(docSnap.data());
-//         } else {
-//           console.warn("No document found with the provided ID.");
-//         }
-//       } catch (error) {
-//         console.error("Error fetching result:", error);
-//       } finally {
-//         setLoading(false);
-//       }
-//     };
+    const countries = Object.keys(countryToCode);
+    const shuffledCtrs = [...countries]
+      .map((value) => ({ value, sort: Math.random() }))
+      .sort((a, b) => a.sort - b.sort)
+      .map(({ value }) => value)
+      .slice(0, 3);
 
-//     fetchResult();
-//   }, [documentId]);
+    setShuffledImages(shuffledImgs);
+    setShuffledCountries(shuffledCtrs);
+  }, []);
 
-//   if (loading) {
-//     return <p>Loading...</p>;
-//   }
+  const handleBoxClick = (boxNumber) => {
+    setSelectedBox(boxNumber);
+  };
 
-//   if (!userData) {
-//     return <p>No data available</p>;
-//   }
+  return (
+    <div className="flex flex-col items-center justify-center gap-4 h-[calc(100vh-8rem)]">
+      <h2 className="text-2xl font-bold text-black uppercase">
+        Your Travel Plan
+      </h2>
+      <div className="flex max-w-full gap-8 p-4 overflow-x-auto">
+        {[1, 2, 3].map((boxNumber) => (
+          <PlanCard
+            key={boxNumber}
+            number={boxNumber}
+            isSelected={selectedBox === boxNumber}
+            onClick={() => handleBoxClick(boxNumber)}
+            showCursor={true}
+            title="STOP"
+            imageSrc={shuffledImages[boxNumber - 1]}
+            subtitle={
+              selectedBox === boxNumber ? (
+                <CountryFlag countryName={shuffledCountries[boxNumber - 1]} />
+              ) : (
+                "Open"
+              )
+            }
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
 
-//   return (
-//     <div>
-//       <h1>Your Travel Plan</h1>
-//       <ul>
-//         <li>
-//           <strong>Purpose:</strong> {userData.travel_purpose || "N/A"}
-//         </li>
-//         <li>
-//           <strong>Style:</strong> {userData.travel_style || "N/A"}
-//         </li>
-//         <li>
-//           <strong>Activities:</strong> {userData.activities || "N/A"}
-//         </li>
-//         <li>
-//           <strong>Budget:</strong> {userData.budget || "N/A"}
-//         </li>
-//         <li>
-//           <strong>Climate:</strong> {userData.climate || "N/A"}
-//         </li>
-//         <li>
-//           <strong>Companion:</strong> {userData.companion || "N/A"}
-//         </li>
-//         <li>
-//           <strong>Duration:</strong> {userData.travel_duration || "N/A"}
-//         </li>
-//         <li>
-//           <strong>Created At:</strong> {userData.createdAt || "N/A"}
-//         </li>
-//       </ul>
-//     </div>
-//   );
-// }
