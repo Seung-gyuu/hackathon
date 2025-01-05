@@ -15,22 +15,25 @@ const ResultModal = ({ isOpen, onClose, result, type }) => {
   const parseResult = (text) => {
     try {
       if (!text || typeof text !== "string") {
-        return "No destination available";
+        return { destination: "No destination available", itinerary: "" };
       }
 
-      const destinationMatch = text.match(/Travel Destination:\s*([^.]+)/);
-      if (destinationMatch && destinationMatch[1]) {
-        return destinationMatch[1].trim();
-      }
-
-      return "Unknown Destination";
-    } catch (error) {
-      console.error("Error parsing result:", error);
-      return "Error parsing destination";
-    }
-  };
-
-  const destination = parseResult(result);
+       const destinationMatch = text.match(/- Destination:\s*([^\n]+)/);
+       const itineraryMatch = text.match(/- Itinerary:\s*([\s\S]+)$/);
+ 
+       // Extract destination and itinerary
+       const destination = destinationMatch && destinationMatch[1] ? destinationMatch[1].trim() : "Unknown Destination";
+       const itinerary = itineraryMatch && itineraryMatch[1] ? itineraryMatch[1].trim() : "No itinerary available";
+ 
+       return { destination, itinerary };
+     } catch (error) {
+       console.error("Error parsing result:", error);
+       return { destination: "Error parsing destination", itinerary: "" };
+     }
+   };
+   const { destination, itinerary } = parseResult(result);
+  
+  
 
   return (
     <div
@@ -51,7 +54,7 @@ const ResultModal = ({ isOpen, onClose, result, type }) => {
 
           <div className="border-b border-gray-100 pb-4">
             <h4 className="text-xl font-semibold text-gray-900">
-              {destination}
+              {destination} <br/> {itinerary}
             </h4>
           </div>
 

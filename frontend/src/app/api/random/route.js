@@ -8,20 +8,40 @@ export async function POST(request) {
   try {
     const body = await request.json();
     const { type } = body;
+     // Log the received type
+     console.log("Received type:", type);
 
     if (!type) {
       return new Response(JSON.stringify({ error: "Type is required" }), {
         status: 400,
       });
     }
-
-    const prompt = `Suggest a travel destination and a short itinerary for the type by short paragraph"${type}".`;
+      // Log before making the OpenAI API call
+      console.log("Sending request to OpenAI with type:", type);
 
     const response = await openai.chat.completions.create({
-      model: "gpt-4",
-      messages: [{ role: "user", content: prompt }],
+      messages: [
+        {
+          role: "user",
+          content: `${type}`,
+        },
+
+        {
+          role: "system",
+          content:"Suggest a random destination and a 1-day itinerary based on the travel type. Format as: - Destination: [Destination Name] - Itinerary: [Brief itinerary, max 80 words]"
+        },
+      ],
+      model: "gpt-4o",
     });
 
+
+    // const prompt = `Suggest a travel destination and a short itinerary for the type by short paragraph"${type}".`;
+
+    // const response = await openai.chat.completions.create({
+    //   model: "gpt-4o",
+    //   messages: [{ role: "user", content: prompt }],
+    // });
+ // Log the full response from OpenAI
     const result = response.choices[0]?.message?.content;
 
     return new Response(JSON.stringify({ result }), { status: 200 });
