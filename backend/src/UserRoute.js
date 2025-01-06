@@ -7,7 +7,6 @@ const router = express.Router();
 const { getAIResponse } = require("./aiController");
 
 router.post("/chat", async (req, res) => {
-  // const docID = "9DFq1dRsAXhyd9o8RbOk";
   const { docID } = req.body;
 
   if (!docID) {
