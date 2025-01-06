@@ -1,11 +1,10 @@
-"use client"; // 클라이언트 컴포넌트임을 명시
+"use client";
 
 import PlanningLayout from "@/components/PlanningLayout";
 import SelectionItem from "@/components/SelectionItem";
 import { useEffect, useState } from "react";
 import { db } from "@/firebase";
-import { doc, getDoc, addDoc, collection } from "firebase/firestore";
-import { useRouter } from "next/navigation";
+import { doc, getDoc } from "firebase/firestore";
 import BasicLoading from "@/components/basicLoading";
 
 export default function Budget() {
@@ -13,16 +12,17 @@ export default function Budget() {
   const [loading, setLoading] = useState(true);
   const [selectedOption, setSelectedOption] = useState(null);
 
-  const router = useRouter();
-
-  // 브라우저 환경에서 localStorage 초기화
+  // ✅ SSR-safe localStorage 초기화
   useEffect(() => {
-    const savedBudget = typeof window !== "undefined"
-      ? localStorage.getItem("selectedBudget")
-      : null;
-    setSelectedOption(savedBudget);
+    if (typeof window !== "undefined") {
+      const storedOption = localStorage.getItem("selectedBudget");
+      if (storedOption) {
+        setSelectedOption(storedOption);
+      }
+    }
   }, []);
 
+  // ✅ Firestore에서 데이터 가져오기
   useEffect(() => {
     const fetchBudgetData = async () => {
       try {
@@ -44,6 +44,7 @@ export default function Budget() {
     fetchBudgetData();
   }, []);
 
+  // ✅ 옵션 선택 핸들러
   const handleSelectOption = (option) => {
     setSelectedOption(option);
     if (typeof window !== "undefined") {
@@ -51,50 +52,8 @@ export default function Budget() {
     }
   };
 
-  const handleSaveToFirestore = async () => {
-    try {
-      const userSelections = {
-        travel_purpose: typeof window !== "undefined" ? localStorage.getItem("selectedPurpose") : null,
-        travel_style: typeof window !== "undefined" ? localStorage.getItem("selectedStyle") : null,
-        activities: typeof window !== "undefined" ? localStorage.getItem("selectedActivity") : null,
-        budget: typeof window !== "undefined" ? localStorage.getItem("selectedBudget") : null,
-        climate: typeof window !== "undefined" ? localStorage.getItem("selectedWeather") : null,
-        companion: typeof window !== "undefined" ? localStorage.getItem("selectedCompanion") : null,
-        travel_duration: typeof window !== "undefined" ? localStorage.getItem("selectedDuration") : null,
-        createdAt: new Date().toISOString(),
-      };
-
-      const filteredSelections = Object.fromEntries(
-        Object.entries(userSelections).filter(([_, value]) => value !== null)
-      );
-
-      const docRef = await addDoc(
-        collection(db, "user_selections"),
-        filteredSelections
-      );
-
-      console.log("Document written with ID: ", docRef.id);
-
-      if (typeof window !== "undefined") {
-        [
-          "selectedPurpose",
-          "selectedStyle",
-          "selectedActivity",
-          "selectedBudget",
-          "selectedWeather",
-          "selectedCompanion",
-          "selectedDuration",
-        ].forEach((key) => localStorage.removeItem(key));
-      }
-
-      console.log("Local storage cleared after successful save.");
-
-      router.push(`/planResult?id=${docRef.id}`);
-    } catch (error) {
-      console.error("Error saving data to Firestore:", error);
-      alert("Failed to save data. Please try again.");
-    }
-  };
+  console.log("budgetData", budgetData);
+  console.log("selectedOption", selectedOption);
 
   if (loading) {
     return <BasicLoading />;
@@ -106,12 +65,12 @@ export default function Budget() {
 
   return (
     <PlanningLayout
-      title="Select Your Budget"
-      currentStep={6}
-      isFinal={false}
+      title="4. Select Your Budget Range"
+      currentStep={4}
+      isNextDisabled={!selectedOption}
     >
-      <div className="grid items-center justify-between w-full grid-cols-2 gap-4 md:h-48 md:flex md:flex-row">
-        {budgetData?.options?.map((option, index) => (
+      <div className="flex flex-col items-center justify-between w-full gap-4 md:flex-row">
+        {budgetData.options?.map((option, index) => (
           <SelectionItem
             key={index}
             title={option}
@@ -119,25 +78,6 @@ export default function Budget() {
             onSelect={() => handleSelectOption(option)}
           />
         ))}
-      </div>
-
-      <div className="flex justify-between w-full gap-4 mt-8">
-        <div className="flex items-center justify-between w-full gap-4 font-semibold">
-          <button
-            className="px-8 py-2 border-2 rounded-full cursor-pointer text-neutralDarkLight border-neutralDarkLight hover:border-neutralDark hover:text-neutralDark"
-            onClick={() => router.push("/planning/climate")}
-          >
-            Back
-          </button>
-
-          <button
-            className="px-8 py-2 border-2 rounded-full cursor-pointer hover:bg-third border-third/80 bg-third/80 text-neutralLight"
-            onClick={handleSaveToFirestore}
-            disabled={!selectedOption}
-          >
-            Next
-          </button>
-        </div>
       </div>
     </PlanningLayout>
   );
