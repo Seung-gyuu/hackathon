@@ -9,55 +9,56 @@ import { useRouter } from "next/navigation";
 import BasicLoading from "@/components/basicLoading";
 
 export default function Activities() {
-  const [activityData, setActivityData] = useState(null); // 활동 데이터 상태
-  const [loading, setLoading] = useState(true); // 로딩 상태
-  const [selectedOption, setSelectedOption] = useState(null); // 선택된 옵션 상태
+  const [activityData, setActivityData] = useState(null); // State to hold the activity data
+  const [loading, setLoading] = useState(true); // State to manage loading status
+  const [selectedOption, setSelectedOption] = useState(null); // State to store the selected option
+  const [title, setTitle] = useState("Loading..."); // State to store the page title
 
   const imgs = [
     "/img/plan/activity1.png",
     "/img/plan/activity2.png",
     "/img/plan/activity3.png",
     "/img/plan/activity4.png",
-  ];
+  ]; // Array of image URLs for activity options
 
-  const router = useRouter();
+  const router = useRouter(); // Router instance for navigation
 
   /**
-   * Firestore에서 활동 데이터 가져오기
+   * Fetch activity data from Firestore
    */
   useEffect(() => {
     const fetchActivityData = async () => {
       try {
-        const docRef = doc(db, "travel_question", "activities");
-        const docSnap = await getDoc(docRef);
+        const docRef = doc(db, "travel_question", "activities"); // Reference to the Firestore document
+        const docSnap = await getDoc(docRef); // Fetch the document
 
         if (docSnap.exists()) {
-          setActivityData(docSnap.data());
-        } else {
-          console.error("No such document!");
+          setActivityData(docSnap.data()); // Set the fetched data to state
+          const title = docSnap.data().question || "Default Title"; // Set the title from fetched data or use default
+          setTitle(title);
         }
       } catch (error) {
-        console.error("Error fetching Activity data:", error);
+        // Handle error (e.g., show alert or log)
       } finally {
-        setLoading(false);
+        setLoading(false); // Set loading to false after fetching data
       }
     };
 
-    fetchActivityData();
+    fetchActivityData(); // Call the function to fetch data
   }, []);
 
   /**
-   * 옵션 선택 핸들러
+   * Handle option selection
    */
   const handleSelectOption = (option) => {
-    setSelectedOption(option);
+    setSelectedOption(option); // Set the selected option
     if (typeof window !== "undefined") {
-      localStorage.setItem("selectedActivity", option);
+      localStorage.setItem("selectedActivity", option); // Save the selected option to localStorage
     }
   };
 
   /**
-   * Firestore에 데이터 저장 및 페이지 이동
+   * Save user selections to Firestore and navigate to results page
    */
   const handleSaveToFirestore = async () => {
     try {
@@ -70,9 +71,9 @@ export default function Activities() {
         companion: localStorage.getItem("selectedCompanion") || null,
         travel_duration: localStorage.getItem("selectedDuration") || null,
         createdAt: new Date().toISOString(),
-      };
+      }; // Create user selection object
 
-      // null 값 제거
+      // Filter out null values
       const filteredSelections = Object.fromEntries(
         Object.entries(userSelections).filter(([_, value]) => value !== null)
       );
@@ -80,11 +81,9 @@ export default function Activities() {
       const docRef = await addDoc(
         collection(db, "user_selections"),
         filteredSelections
-      );
+      ); // Save filtered selections to Firestore
 
-      console.log("Document written with ID: ", docRef.id);
-
-      // localStorage 초기화
+      // Clear localStorage after saving
       [
         "selectedPurpose",
         "selectedStyle",
@@ -95,39 +94,36 @@ export default function Activities() {
         "selectedDuration",
       ].forEach((key) => localStorage.removeItem(key));
 
-      console.log("Local storage cleared after successful save.");
-
-      router.push(`/planResult?id=${docRef.id}`);
+      router.push(`/planResult?id=${docRef.id}`); // Navigate to the results page with the document ID
     } catch (error) {
-      console.error("Error saving data to Firestore:", error);
-      alert("Failed to save data. Please try again.");
+      alert("Failed to save data. Please try again."); // Show an alert if saving fails
     }
   };
 
   /**
-   * 로딩 상태
+   * Render loading state
    */
   if (loading) {
-    return <BasicLoading />;
+    return <BasicLoading />; // Show loading component if data is still being fetched
   }
 
   /**
-   * 데이터가 없을 경우
+   * Render if no data is available
    */
   if (!activityData) {
-    return <p>No data available</p>;
+    return <p>No data available</p>; // Show message if no data is found
   }
 
   /**
-   * 화면 렌더링
+   * Render the component UI
    */
   return (
     <PlanningLayout
-      title="7. Select Your Activities"
+      title={title}
       currentStep={7}
       isFinal={true}
     >
-      {/* 옵션 선택 영역 */}
+      {/* Render selection options */}
       <div className="grid items-center justify-between w-full grid-cols-2 gap-4 md:h-48 md:flex md:flex-row">
         {activityData?.options?.map((option, index) => (
           <SelectionItem
@@ -140,10 +136,10 @@ export default function Activities() {
         ))}
       </div>
 
-      {/* 버튼 영역 */}
+      {/* Render navigation buttons */}
       <div className="flex justify-between w-full gap-4 mt-8">
         <div className="flex items-center justify-between w-full gap-4 font-semibold">
-          {/* 이전 버튼 */}
+          {/* Back button */}
           <button
             className="px-8 py-2 border-2 rounded-full cursor-pointer text-neutralDarkLight border-neutralDarkLight hover:border-neutralDark hover:text-neutralDark"
             onClick={() => router.push("/planning/companion")}
@@ -151,7 +147,7 @@ export default function Activities() {
             Back
           </button>
 
-          {/* 결과 보기 버튼 */}
+          {/* View Results button */}
           <button
             className="px-8 py-2 border-2 rounded-full cursor-pointer hover:bg-third border-third/80 bg-third/80 text-neutralLight"
             onClick={handleSaveToFirestore}
