@@ -17,6 +17,21 @@ app.use(
 app.use(express.json());
 app.use("/api", userRoute);
 
+app.post('/api/chat', async (req, res) => {
+  const { docID } = req.body;
+
+  if (!docID) {
+    return res.status(400).json({ error: 'docID is required' });
+  }
+
+  try {
+    const aiResponse = await getAIResponse(docID);
+    res.json({ result: aiResponse });
+  } catch (error) {
+    console.error('Error handling /api/chat request:', error);
+    res.status(500).json({ error: 'Failed to process the request' });
+  }
+});
 
 module.exports = app;
 
