@@ -54,7 +54,7 @@ function PlanResultContent() {
 
       try {
         const response = await fetch(
-          process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api/chat",
+          "https://hackathon-glnw.onrender.com" || "http://localhost:3001/api/chat",
           {
             method: "POST",
             mode: "cors",
