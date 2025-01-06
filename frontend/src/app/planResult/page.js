@@ -15,7 +15,7 @@ function PlanResultContent() {
   const documentId = searchParams?.get("id");
 
   useEffect(() => {
-    const fetchUserData = async () => {
+    const fetchData = async () => {
       if (!documentId) {
         console.warn("No document ID found in the URL.");
         setLoading(false);
@@ -23,65 +23,55 @@ function PlanResultContent() {
       }
 
       try {
-        const docRef = doc(db, "user_selections", documentId);
-        const docSnap = await getDoc(docRef);
+        const fetchUserData = async () => {
+          const docRef = doc(db, "user_selections", documentId);
+          const docSnap = await getDoc(docRef);
 
-        if (docSnap.exists()) {
-          setUserData(docSnap.data());
-        } else {
-          console.warn("No document found with the provided ID.");
-        }
-      } catch (error) {
-        console.error("Error fetching user data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUserData();
-  }, [documentId]);
-
-  useEffect(() => {
-    const fetchAIResult = async () => {
-      if (!documentId) return;
-
-      try {
-        const response = await fetch(
-          "https://hackathon-glnw.onrender.com/api/chat",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ docID: documentId }),
+          if (docSnap.exists()) {
+            setUserData(docSnap.data());
+          } else {
+            console.warn("No document found with the provided ID.");
           }
-        );
+        };
 
-        if (!response.ok) {
-          throw new Error(`Failed to fetch result: ${response.statusText}`);
-        }
-
-        const data = await response.json();
-
-        let parsedResult;
-        try {
-          parsedResult = JSON.parse(
-            data.result.replace(/^```json/, "").replace(/```$/, "").trim()
+        const fetchAIResult = async () => {
+          const response = await fetch(
+            "https://hackathon-glnw.onrender.com/api/chat",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ docID: documentId }),
+            }
           );
-          setResult(parsedResult);
-        } catch (parseError) {
-          console.error("Error parsing JSON:", parseError);
-          setResult([]);
-        }
+
+          if (!response.ok) {
+            throw new Error(`Failed to fetch result: ${response.statusText}`);
+          }
+
+          const data = await response.json();
+
+          try {
+            const parsedResult = JSON.parse(
+              data.result.replace(/^```json/, "").replace(/```$/, "").trim()
+            );
+            setResult(parsedResult);
+          } catch (parseError) {
+            console.error("Error parsing JSON:", parseError);
+            setResult([]);
+          }
+        };
+
+        await Promise.all([fetchUserData(), fetchAIResult()]);
       } catch (error) {
-        console.error("Error fetching AI result:", error);
-        setResult([]);
+        console.error("Error fetching data:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchAIResult();
+    fetchData();
   }, [documentId]);
 
   if (loading) {
