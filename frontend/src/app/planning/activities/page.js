@@ -1,4 +1,5 @@
-"use client";
+"use client"; // 클라이언트 컴포넌트임을 명시
+
 import PlanningLayout from "@/components/PlanningLayout";
 import SelectionItem from "@/components/SelectionItem";
 import { useEffect, useState } from "react";
@@ -10,17 +11,16 @@ import BasicLoading from "@/components/basicLoading";
 export default function Activities() {
   const [activityData, setActivityData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [selectedOption, setSelectedOption] = useState(
-    () => localStorage.getItem("selectedActivity") || null
-  );
+  const [selectedOption, setSelectedOption] = useState(null);
 
-  const imgs = [
-    "/img/plan/activity1.png",
-    "/img/plan/activity2.png",
-    "/img/plan/activity3.png",
-    "/img/plan/activity4.png",
-  ];
   const router = useRouter();
+
+  useEffect(() => {
+    const savedActivity = typeof window !== "undefined" 
+      ? localStorage.getItem("selectedActivity") 
+      : null;
+    setSelectedOption(savedActivity);
+  }, []);
 
   useEffect(() => {
     const fetchActivityData = async () => {
@@ -37,7 +37,6 @@ export default function Activities() {
         console.error("Error fetching Activity data:", error);
       } finally {
         setLoading(false);
-        // setTimeout(() => setLoading(false), 1000);
       }
     };
 
@@ -46,19 +45,21 @@ export default function Activities() {
 
   const handleSelectOption = (option) => {
     setSelectedOption(option);
-    localStorage.setItem("selectedActivity", option);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("selectedActivity", option);
+    }
   };
 
   const handleSaveToFirestore = async () => {
     try {
       const userSelections = {
-        travel_purpose: localStorage.getItem("selectedPurpose") || null,
-        travel_style: localStorage.getItem("selectedStyle") || null,
-        activities: localStorage.getItem("selectedActivity") || null,
-        budget: localStorage.getItem("selectedBudget") || null,
-        climate: localStorage.getItem("selectedWeather") || null,
-        companion: localStorage.getItem("selectedCompanion") || null,
-        travel_duration: localStorage.getItem("selectedDuration") || null,
+        travel_purpose: typeof window !== "undefined" ? localStorage.getItem("selectedPurpose") : null,
+        travel_style: typeof window !== "undefined" ? localStorage.getItem("selectedStyle") : null,
+        activities: typeof window !== "undefined" ? localStorage.getItem("selectedActivity") : null,
+        budget: typeof window !== "undefined" ? localStorage.getItem("selectedBudget") : null,
+        climate: typeof window !== "undefined" ? localStorage.getItem("selectedWeather") : null,
+        companion: typeof window !== "undefined" ? localStorage.getItem("selectedCompanion") : null,
+        travel_duration: typeof window !== "undefined" ? localStorage.getItem("selectedDuration") : null,
         createdAt: new Date().toISOString(),
       };
 
@@ -73,15 +74,17 @@ export default function Activities() {
 
       console.log("Document written with ID: ", docRef.id);
 
-      [
-        "selectedPurpose",
-        "selectedStyle",
-        "selectedActivity",
-        "selectedBudget",
-        "selectedWeather",
-        "selectedCompanion",
-        "selectedDuration",
-      ].forEach((key) => localStorage.removeItem(key));
+      if (typeof window !== "undefined") {
+        [
+          "selectedPurpose",
+          "selectedStyle",
+          "selectedActivity",
+          "selectedBudget",
+          "selectedWeather",
+          "selectedCompanion",
+          "selectedDuration",
+        ].forEach((key) => localStorage.removeItem(key));
+      }
 
       console.log("Local storage cleared after successful save.");
 
@@ -99,9 +102,10 @@ export default function Activities() {
   if (!activityData) {
     return <p>No data available</p>;
   }
+
   return (
     <PlanningLayout
-      title="7. Select Your Activities"
+      title="Select Your Activities"
       currentStep={7}
       isFinal={true}
     >
@@ -110,7 +114,6 @@ export default function Activities() {
           <SelectionItem
             key={index}
             title={option}
-            img={imgs[index]}
             isSelected={selectedOption === option}
             onSelect={() => handleSelectOption(option)}
           />
@@ -122,7 +125,6 @@ export default function Activities() {
           <button
             className="px-8 py-2 border-2 rounded-full cursor-pointer text-neutralDarkLight border-neutralDarkLight hover:border-neutralDark hover:text-neutralDark"
             onClick={() => router.push("/planning/companion")}
-            // disabled={isBackDisabled}
           >
             Back
           </button>
