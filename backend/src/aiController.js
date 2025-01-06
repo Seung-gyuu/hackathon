@@ -64,7 +64,6 @@ Return the result in the following JSON format:
       },
       "day2": { ... },
       "day3": { ... },
-    "...": { ... }
     },
     "activities": ["activity1", "activity2", "activity3"],
   }
