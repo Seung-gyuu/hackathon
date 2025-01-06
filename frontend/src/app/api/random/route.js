@@ -16,25 +16,6 @@ export async function POST(request) {
         status: 400,
       });
     }
-<<<<<<< HEAD
-      // Log before making the OpenAI API call
-      console.log("Sending request to OpenAI with type:", type);
-
-    const response = await openai.chat.completions.create({
-      messages: [
-        {
-          role: "user",
-          content: `${type}`,
-        },
-
-        {
-          role: "system",
-          content:"Suggest a random destination and a 1-day itinerary based on the travel type. Format as: - Destination: [Destination Name] - Itinerary: [Brief itinerary, max 80 words]"
-        },
-      ],
-      model: "gpt-4o",
-=======
-
     const prompt = `Based on the travel type: "${type}", recommend one travel destination with the following details:
 
 1. **Destination Name:** Provide the name of a city or region that matches the travel type.
@@ -75,17 +56,8 @@ Format the response as a structured JSON like this:
     const response = await openai.chat.completions.create({
       model: "gpt-4o",
       messages: [{ role: "user", content: prompt }],
->>>>>>> upstream/main
     });
 
-
-    // const prompt = `Suggest a travel destination and a short itinerary for the type by short paragraph"${type}".`;
-
-    // const response = await openai.chat.completions.create({
-    //   model: "gpt-4o",
-    //   messages: [{ role: "user", content: prompt }],
-    // });
- // Log the full response from OpenAI
     const result = response.choices[0]?.message?.content;
 
     return new Response(JSON.stringify({ result }), { status: 200 });
