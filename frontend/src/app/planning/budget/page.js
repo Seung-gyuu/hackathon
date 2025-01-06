@@ -13,6 +13,12 @@ export default function Budget() {
     () => localStorage.getItem("selectedBudget") || null
   );
 
+  const icons = [
+    "/img/plan/money1-removebg-preview.png",
+    "/img/plan/money2-removebg-preview.png",
+    "/img/plan/money3-removebg-preview.png",
+  ];
+
   useEffect(() => {
     const fetchBudgetData = async () => {
       try {
@@ -62,6 +68,7 @@ export default function Budget() {
           <SelectionItem
             key={index}
             title={option}
+            icon={icons[index]}
             isSelected={selectedOption === option ? true : false}
             onSelect={() => handleSelectOption(option)}
           />

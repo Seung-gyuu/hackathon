@@ -105,7 +105,7 @@ export default function RandomPlanner() {
     <>
       <div className="flex flex-col items-center justify-center gap-4 h-[calc(100vh-8rem)]">
         <div className="flex flex-col items-center">
-          <h2 className="text-xl font-bold text-black uppercase mb-8">
+          <h2 className="text-3xl font-bold text-black uppercase mb-20 mt-60">
             Random Travel
           </h2>
 

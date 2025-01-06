@@ -13,6 +13,13 @@ export default function Companion() {
     () => localStorage.getItem("selectedCompanion") || null
   );
 
+  const imgs = [
+    "/img/plan/solo-removebg-preview.png",
+    "/img/plan/family-removebg-preview.png",
+    "/img/plan/friends-removebg-preview.png",
+    "/img/plan/partner-removebg-preview.png",
+  ];
+
   useEffect(() => {
     const fetchCompanionData = async () => {
       try {
@@ -62,6 +69,7 @@ export default function Companion() {
           <SelectionItem
             key={index}
             title={option}
+            img={imgs[index]}
             isSelected={selectedOption === option ? true : false}
             onSelect={() => handleSelectOption(option)}
           />

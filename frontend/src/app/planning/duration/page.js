@@ -13,6 +13,12 @@ export default function Duration() {
     () => localStorage.getItem("selectedDuration") || null
   );
 
+  const icons = [
+    "/img/plan/short-removebg-preview.png",
+    "/img/plan/medium-removebg-preview.png",
+    "/img/plan/long-removebg-preview.png",
+  ];
+
   useEffect(() => {
     const fetchDurationData = async () => {
       try {
@@ -62,6 +68,7 @@ export default function Duration() {
           <SelectionItem
             key={index}
             title={option}
+            icon={icons[index]}
             isSelected={selectedOption === option ? true : false}
             onSelect={() => handleSelectOption(option)}
           />

@@ -14,6 +14,12 @@ export default function Activities() {
     () => localStorage.getItem("selectedActivity") || null
   );
 
+  const imgs = [
+    "/img/plan/activity1.png",
+    "/img/plan/activity2.png",
+    "/img/plan/activity3.png",
+    "/img/plan/activity4.png",
+  ];
   const router = useRouter();
 
   useEffect(() => {
@@ -95,7 +101,7 @@ export default function Activities() {
   }
   return (
     <PlanningLayout
-      title="Select Your Activities"
+      title="7. Select Your Activities"
       currentStep={7}
       isFinal={true}
     >
@@ -104,6 +110,7 @@ export default function Activities() {
           <SelectionItem
             key={index}
             title={option}
+            img={imgs[index]}
             isSelected={selectedOption === option}
             onSelect={() => handleSelectOption(option)}
           />
