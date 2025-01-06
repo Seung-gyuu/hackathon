@@ -6,7 +6,6 @@ import { doc, getDoc } from "firebase/firestore";
 import { useSearchParams } from "next/navigation";
 import LoadingScreen from "@/components/LoadingScreen";
 import DestinationCard from "@/components/DestinationCard";
-import HomeButton from "@/components/HomeButton";
 
 /**
  * 🔹 PlanResultContent 컴포넌트 (실제 로직 포함)
@@ -58,6 +57,7 @@ function PlanResultContent() {
           process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api/chat",
           {
             method: "POST",
+            mode: "cors",
             headers: {
               "Content-Type": "application/json",
             },
