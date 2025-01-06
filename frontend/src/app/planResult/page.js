@@ -5,7 +5,7 @@ import { doc, getDoc } from "firebase/firestore";
 import { useSearchParams } from "next/navigation";
 import LoadingScreen from "@/components/LoadingScreen";
 import DestinationCard from "@/components/DestinationCard";
-
+import HomeButton from "@/components/HomeButton";
 export default function PlanResult() {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -102,6 +102,9 @@ export default function PlanResult() {
             activities={destination.activities || []}
           />
         ))}
+      </div>
+      <div className="flex justify-center w-full mt-8">
+        <HomeButton />
       </div>
     </div>
   );
