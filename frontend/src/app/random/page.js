@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import PlanCard from "@/components/PlanCard";
 import LoadingScreen from "@/components/LoadingScreen";
 import ResultModal from "@/components/ResultModal";
-import NavigationButtons from "@/components/NavigationButtons";
+import RandomNavButtons from "@/components/RandomNavButton";
 
 import activity from "../../../public/img/random/activity-removebg-preview.png";
 import shopping from "../../../public/img/random/shopping-removebg-preview.png";
@@ -103,12 +103,12 @@ export default function RandomPlanner() {
 
   return (
     <>
-      <div className="min-h-screen pt-8">
+      <div className="flex flex-col items-center justify-center gap-4 h-[calc(100vh-8rem)]">
         <div className="flex flex-col items-center">
           <h2 className="text-xl font-bold text-black uppercase mb-8">
             Random Travel
           </h2>
-          
+
           <div className="flex flex-wrap justify-center gap-4 px-4 mb-8">
             {[1, 2, 3, 4].map((boxNumber) => (
               <PlanCard
@@ -131,7 +131,7 @@ export default function RandomPlanner() {
           </div>
 
           <div className="mb-8">
-            <NavigationButtons />
+            <RandomNavButtons />
           </div>
         </div>
       </div>
