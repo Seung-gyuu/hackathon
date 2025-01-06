@@ -5,6 +5,7 @@ import { doc, getDoc } from "firebase/firestore";
 import { useSearchParams, useRouter } from "next/navigation";
 import LoadingScreen from "@/components/LoadingScreen";
 import DestinationCard from "@/components/DestinationCard";
+import HomeButton from "@/components/HomeButton";
 
 function PlanResultContent() {
   const [userData, setUserData] = useState(null);
@@ -14,16 +15,18 @@ function PlanResultContent() {
   const router = useRouter();
   const documentId = searchParams.get("id");
 
-  // Firestore에서 사용자 데이터 가져오기
+  /**
+   * Firestore에서 사용자 데이터 가져오기
+   */
   useEffect(() => {
-    const fetchResult = async () => {
-      try {
-        if (!documentId) {
-          console.warn("No document ID found in the URL.");
-          setLoading(false);
-          return;
-        }
+    const fetchUserData = async () => {
+      if (!documentId) {
+        console.warn("No document ID found in the URL.");
+        setLoading(false);
+        return;
+      }
 
+      try {
         const docRef = doc(db, "user_selections", documentId);
         const docSnap = await getDoc(docRef);
 
@@ -33,26 +36,36 @@ function PlanResultContent() {
           console.warn("No document found with the provided ID.");
         }
       } catch (error) {
-        console.error("Error fetching result:", error);
+        console.error("Error fetching user data:", error);
+      } finally {
+        setLoading(false);
       }
     };
-    fetchResult();
+
+    fetchUserData();
   }, [documentId]);
 
-  // AI API에서 결과 가져오기
+  /**
+   * AI API에서 결과 가져오기
+   */
   useEffect(() => {
-    const fetchResult = async () => {
+    const fetchAIResult = async () => {
+      if (!documentId) return;
+
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}/api/chat`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ docID: documentId }),
-        });
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/chat`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ docID: documentId }),
+          }
+        );
 
         if (!response.ok) {
-          throw new Error("Failed to fetch result");
+          throw new Error("Failed to fetch result from API");
         }
 
         const data = await response.json();
@@ -65,34 +78,50 @@ function PlanResultContent() {
               .replace(/```$/, "")
               .trim()
           );
-
           setResult(parsedResult);
         } catch (parseError) {
           console.error("Error parsing JSON:", parseError);
           setResult([]);
         }
       } catch (error) {
-        console.error("Error fetching result:", error);
+        console.error("Error fetching result from API:", error);
         setResult([]);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchResult();
+    fetchAIResult();
   }, [documentId]);
 
+  /**
+   * Debugging logs
+   */
   console.log("result", result);
   console.log("userData", userData);
 
+  /**
+   * 로딩 상태
+   */
   if (loading) {
     return <LoadingScreen />;
   }
 
+  /**
+   * 데이터가 없을 경우
+   */
   if (!userData || result.length === 0) {
-    return <p>No data available</p>;
+    return (
+      <div className="flex flex-col items-center justify-center h-screen">
+        <p>No data available</p>
+        <HomeButton />
+      </div>
+    );
   }
 
+  /**
+   * 데이터 표시
+   */
   return (
     <div className="flex flex-col items-center justify-center flex-1 h-[calc(100vh-8rem)] container">
       <div className="grid items-center justify-center w-full grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -106,17 +135,16 @@ function PlanResultContent() {
           />
         ))}
       </div>
-      <button
-        className="px-8 py-2 border-2 rounded-full cursor-pointer hover:bg-third border-third/80 bg-third/80 text-neutralLight mt-4"
-        onClick={() => router.push("/")}
-      >
-        Go Home
-      </button>
+      <div className="flex justify-center w-full mt-8">
+        <HomeButton />
+      </div>
     </div>
   );
 }
 
-// Suspense로 감싸기
+/**
+ * Suspense로 감싸기
+ */
 export default function PlanResult() {
   return (
     <Suspense fallback={<LoadingScreen />}>

@@ -7,7 +7,6 @@ const app = express();
 app.use(
   cors({
     origin: [
-      "http://localhost:3000", // 개발 환경
       "hackathon-six-woad.vercel.app"
     ],
     methods: ["GET", "POST"],
