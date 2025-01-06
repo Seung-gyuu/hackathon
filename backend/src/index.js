@@ -2,7 +2,6 @@ const express = require("express");
 const cors = require("cors");
 const userRoute = require("./UserRoute");
 
-app.use(cors());
 const app = express();
 
 app.use(
@@ -19,6 +18,10 @@ app.use(
 app.use(express.json());
 app.use("/api", userRoute);
 
+app.post("/api/chat", (req, res) => {
+  // Your chat logic here
+  res.json({ message: "CORS issue fixed!" });
+});
 
 
 
