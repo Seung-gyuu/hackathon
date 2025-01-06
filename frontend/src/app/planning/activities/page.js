@@ -37,9 +37,7 @@ export default function Activities() {
           const title = docSnap.data().question || "Default Title"; // Set the title from fetched data or use default
           setTitle(title);
         }
-      } catch (error) {
-        // Handle error (e.g., show alert or log)
-      } finally {
+      }  finally {
         setLoading(false); // Set loading to false after fetching data
       }
     };
@@ -119,7 +117,7 @@ export default function Activities() {
    */
   return (
     <PlanningLayout
-      title={title}
+      title={`7. ${title}`}
       currentStep={7}
       isFinal={true}
     >

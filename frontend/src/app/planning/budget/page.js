@@ -8,9 +8,10 @@ import { doc, getDoc } from "firebase/firestore";
 import BasicLoading from "@/components/basicLoading";
 
 export default function Budget() {
-  const [budgetData, setBudgetData] = useState(null); // 예산 데이터 상태
-  const [loading, setLoading] = useState(true); // 로딩 상태
-  const [selectedOption, setSelectedOption] = useState(null); // 선택된 옵션 상태
+  const [budgetData, setBudgetData] = useState(null); // State to hold budget data
+  const [loading, setLoading] = useState(true); // Loading state
+  const [selectedOption, setSelectedOption] = useState(null); // State for selected option
+  const [title, setTitle] = useState("Loading...");
 
   const icons = [
     "/img/plan/money1-removebg-preview.png",
@@ -18,9 +19,7 @@ export default function Budget() {
     "/img/plan/money3-removebg-preview.png",
   ];
 
-  /**
-   * Firestore에서 예산 데이터 가져오기
-   */
+  // Fetch budget data from Firestore
   useEffect(() => {
     const fetchBudgetData = async () => {
       try {
@@ -29,17 +28,15 @@ export default function Budget() {
 
         if (docSnap.exists()) {
           setBudgetData(docSnap.data());
-        } else {
-          console.error("No such document!");
+          const title = docSnap.data().question || "Default Title"; // Set the title from fetched data or use default
+          setTitle(title);
         }
 
-        // 로컬 스토리지에서 선택된 옵션 불러오기
+        // Load selected option from local storage
         if (typeof window !== "undefined") {
           const storedOption = localStorage.getItem("selectedBudget");
           if (storedOption) setSelectedOption(storedOption);
         }
-      } catch (error) {
-        console.error("Error fetching Budget data:", error);
       } finally {
         setLoading(false);
       }
@@ -48,9 +45,7 @@ export default function Budget() {
     fetchBudgetData();
   }, []);
 
-  /**
-   * 옵션 선택 핸들러
-   */
+  // Handler for selecting an option
   const handleSelectOption = (option) => {
     setSelectedOption(option);
     if (typeof window !== "undefined") {
@@ -58,30 +53,24 @@ export default function Budget() {
     }
   };
 
-  /**
-   * 로딩 상태
-   */
+  // Show loading spinner
   if (loading) {
     return <BasicLoading />;
   }
 
-  /**
-   * 데이터가 없을 경우
-   */
+  // Show message if no data is available
   if (!budgetData) {
     return <p>No data available</p>;
   }
 
-  /**
-   * 화면 렌더링
-   */
+  // Render the page
   return (
     <PlanningLayout
-      title="4. Select Your Budget Range"
+      title={`4. ${title}`}
       currentStep={4}
       isNextDisabled={!selectedOption}
     >
-      {/* 옵션 선택 영역 */}
+      {/* Options selection area */}
       <div className="flex flex-col items-center justify-between w-full gap-4 md:flex-row">
         {budgetData.options?.map((option, index) => (
           <SelectionItem

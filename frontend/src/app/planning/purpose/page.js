@@ -8,9 +8,10 @@ import { doc, getDoc } from "firebase/firestore";
 import BasicLoading from "@/components/basicLoading";
 
 export default function Purpose() {
-  const [purposeData, setPurposeData] = useState(null); // 여행 목적 데이터 상태
-  const [loading, setLoading] = useState(true); // 로딩 상태
-  const [selectedOption, setSelectedOption] = useState(null); // 선택된 옵션 상태
+  const [purposeData, setPurposeData] = useState(null); // State for travel purpose data
+  const [loading, setLoading] = useState(true); // Loading state
+  const [selectedOption, setSelectedOption] = useState(null); // State for selected option
+  const [title, setTitle] = useState("Loading..."); // State to store the page title
 
   const imgs = [
     "/images/plan-1-1.png",
@@ -20,7 +21,7 @@ export default function Purpose() {
   ];
 
   /**
-   * Firestore에서 여행 목적 데이터 가져오기
+   * Fetch travel purpose data from Firestore
    */
   useEffect(() => {
     const fetchPurposeData = async () => {
@@ -30,17 +31,15 @@ export default function Purpose() {
 
         if (docSnap.exists()) {
           setPurposeData(docSnap.data());
-        } else {
-          console.error("No such document!");
-        }
+          const title = docSnap.data().question || "Default Title"; // Set the title from fetched data or use default
+          setTitle(title);
+        } 
 
-        // 로컬 스토리지에서 선택된 옵션 불러오기
+        // Retrieve selected option from localStorage
         if (typeof window !== "undefined") {
           const storedOption = localStorage.getItem("selectedPurpose");
           if (storedOption) setSelectedOption(storedOption);
         }
-      } catch (error) {
-        console.error("Error fetching purpose data:", error);
       } finally {
         setLoading(false);
       }
@@ -50,40 +49,39 @@ export default function Purpose() {
   }, []);
 
   /**
-   * 옵션 선택 핸들러
+   * Option select handler
    */
   const handleSelectOption = (option) => {
     setSelectedOption(option);
     if (typeof window !== "undefined") {
       localStorage.setItem("selectedPurpose", option);
     }
-    console.log(`Selected: ${option}`);
   };
 
   /**
-   * 로딩 상태
+   * Loading state
    */
   if (loading) {
     return <BasicLoading />;
   }
 
   /**
-   * 데이터가 없을 경우
+   * If no data is available
    */
   if (!purposeData) {
     return <p>No data available</p>;
   }
 
   /**
-   * 화면 렌더링
+   * Render the page
    */
   return (
     <PlanningLayout
-      title="1. What is the purpose of your trip?"
+      title={`1. ${title}`}
       currentStep={1}
       isNextDisabled={!selectedOption}
     >
-      {/* 옵션 선택 영역 */}
+      {/* Option selection area */}
       <div className="grid items-center justify-between w-full grid-cols-2 gap-4 md:h-48 md:flex md:flex-row">
         {purposeData.options?.map((option, index) => (
           <SelectionItem

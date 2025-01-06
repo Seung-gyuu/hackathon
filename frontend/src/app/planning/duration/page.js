@@ -8,9 +8,10 @@ import { doc, getDoc } from "firebase/firestore";
 import BasicLoading from "@/components/basicLoading";
 
 export default function Duration() {
-  const [durationData, setDurationData] = useState(null); // 여행 기간 데이터 상태
-  const [loading, setLoading] = useState(true); // 로딩 상태
-  const [selectedOption, setSelectedOption] = useState(null); // 선택된 옵션 상태
+  const [durationData, setDurationData] = useState(null); // State for duration data
+  const [loading, setLoading] = useState(true); // Loading state
+  const [selectedOption, setSelectedOption] = useState(null); // Selected option state
+  const [title, setTitle] = useState("Loading..."); // Page title state
 
   const icons = [
     "/img/plan/short-removebg-preview.png",
@@ -18,9 +19,7 @@ export default function Duration() {
     "/img/plan/long-removebg-preview.png",
   ];
 
-  /**
-   * Firestore에서 여행 기간 데이터 가져오기
-   */
+  // Fetch duration data from Firestore
   useEffect(() => {
     const fetchDurationData = async () => {
       try {
@@ -29,17 +28,15 @@ export default function Duration() {
 
         if (docSnap.exists()) {
           setDurationData(docSnap.data());
-        } else {
-          console.error("No such document!");
+          const title = docSnap.data().question || "Default Title"; // Set title from data or use default
+          setTitle(title);
         }
 
-        // 로컬 스토리지에서 선택된 옵션 불러오기
+        // Load selected option from local storage
         if (typeof window !== "undefined") {
           const storedOption = localStorage.getItem("selectedDuration");
           if (storedOption) setSelectedOption(storedOption);
         }
-      } catch (error) {
-        console.error("Error fetching Duration data:", error);
       } finally {
         setLoading(false);
       }
@@ -48,41 +45,30 @@ export default function Duration() {
     fetchDurationData();
   }, []);
 
-  /**
-   * 옵션 선택 핸들러
-   */
+  // Handle option selection
   const handleSelectOption = (option) => {
     setSelectedOption(option);
     if (typeof window !== "undefined") {
       localStorage.setItem("selectedDuration", option);
     }
-    console.log(`Selected: ${option}`);
   };
 
-  /**
-   * 로딩 상태
-   */
   if (loading) {
     return <BasicLoading />;
   }
 
-  /**
-   * 데이터가 없을 경우
-   */
   if (!durationData) {
     return <p>No data available</p>;
   }
 
-  /**
-   * 화면 렌더링
-   */
+  // Render the page
   return (
     <PlanningLayout
-      title="5. How Long is Your Trip?"
+      title={`5. ${title}`}
       currentStep={5}
       isNextDisabled={!selectedOption}
     >
-      {/* 옵션 선택 영역 */}
+      {/* Option selection area */}
       <div className="flex flex-col items-center justify-between w-full gap-4 md:flex-row">
         {durationData.options?.map((option, index) => (
           <SelectionItem

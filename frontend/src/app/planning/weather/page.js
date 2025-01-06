@@ -8,9 +8,10 @@ import { doc, getDoc } from "firebase/firestore";
 import BasicLoading from "@/components/basicLoading";
 
 export default function Weather() {
-  const [weatherData, setWeatherData] = useState(null); // 날씨 데이터 상태
-  const [loading, setLoading] = useState(true); // 로딩 상태
-  const [selectedOption, setSelectedOption] = useState(null); // 선택된 옵션 상태
+  const [weatherData, setWeatherData] = useState(null); // State for weather data
+  const [loading, setLoading] = useState(true); // Loading state
+  const [selectedOption, setSelectedOption] = useState(null); // State for selected option
+  const [title, setTitle] = useState("Loading..."); // State to store the page title
 
   const icons = [
     "/img/plan/spring-removebg-preview.png",
@@ -19,7 +20,7 @@ export default function Weather() {
   ];
 
   /**
-   * Firestore에서 날씨 데이터 가져오기
+   * Fetch weather data from Firestore
    */
   useEffect(() => {
     const fetchWeatherData = async () => {
@@ -29,11 +30,11 @@ export default function Weather() {
 
         if (docSnap.exists()) {
           setWeatherData(docSnap.data());
-        } else {
-          console.error("No such document!");
-        }
+          const title = docSnap.data().question || "Default Title"; // Set the title from fetched data or use default
+          setTitle(title);
+        } 
 
-        // 로컬 스토리지에서 선택된 옵션 불러오기
+        // Retrieve selected option from localStorage
         if (typeof window !== "undefined") {
           const storedOption = localStorage.getItem("selectedWeather");
           if (storedOption) setSelectedOption(storedOption);
@@ -49,36 +50,35 @@ export default function Weather() {
   }, []);
 
   /**
-   * 옵션 선택 핸들러
+   * Option select handler
    */
   const handleSelectOption = (option) => {
     setSelectedOption(option);
     if (typeof window !== "undefined") {
       localStorage.setItem("selectedWeather", option);
     }
-    console.log(`Selected: ${option}`);
   };
 
   /**
-   * 로딩 상태
+   * Loading state
    */
   if (loading) {
     return <BasicLoading />;
   }
 
   /**
-   * 데이터가 없을 경우
+   * If no data is available
    */
   if (!weatherData) {
     return <p>No data available</p>;
   }
 
   /**
-   * 화면 렌더링
+   * Render the page
    */
   return (
     <PlanningLayout
-      title="3. Select Your Preferred Weather"
+      title={`3. ${title}`}
       currentStep={3}
       isNextDisabled={!selectedOption}
     >

@@ -8,9 +8,10 @@ import { doc, getDoc } from "firebase/firestore";
 import BasicLoading from "@/components/basicLoading";
 
 export default function Type() {
-  const [travelStyleData, setTravelStyleData] = useState(null); // 여행 스타일 데이터 상태
-  const [loading, setLoading] = useState(true); // 로딩 상태
-  const [selectedOption, setSelectedOption] = useState(null); // 선택된 옵션 상태
+  const [travelStyleData, setTravelStyleData] = useState(null); // State for travel style data
+  const [loading, setLoading] = useState(true); // Loading state
+  const [selectedOption, setSelectedOption] = useState(null); // State for selected option
+  const [title, setTitle] = useState("Loading..."); // State to store the page title
 
   const icons = [
     "/images/plan-2-1.png",
@@ -19,7 +20,7 @@ export default function Type() {
   ];
 
   /**
-   * Firestore에서 여행 스타일 데이터 가져오기
+   * Fetch travel style data from Firestore
    */
   useEffect(() => {
     const fetchTravelStyleData = async () => {
@@ -29,11 +30,11 @@ export default function Type() {
 
         if (docSnap.exists()) {
           setTravelStyleData(docSnap.data());
-        } else {
-          console.error("No such document!");
-        }
+          const title = docSnap.data().question || "Default Title"; // Set the title from fetched data or use default
+          setTitle(title);
+        } 
 
-        // 로컬 스토리지에서 선택된 옵션 불러오기
+        // Retrieve selected option from localStorage
         if (typeof window !== "undefined") {
           const storedOption = localStorage.getItem("selectedStyle");
           if (storedOption) setSelectedOption(storedOption);
@@ -49,40 +50,39 @@ export default function Type() {
   }, []);
 
   /**
-   * 옵션 선택 핸들러
+   * Option select handler
    */
   const handleSelectOption = (option) => {
     setSelectedOption(option);
     if (typeof window !== "undefined") {
       localStorage.setItem("selectedStyle", option);
     }
-    console.log(`Selected: ${option}`);
   };
 
   /**
-   * 로딩 상태
+   * Loading state
    */
   if (loading) {
     return <BasicLoading />;
   }
 
   /**
-   * 데이터가 없을 경우
+   * If no data is available
    */
   if (!travelStyleData) {
     return <p>No data available</p>;
   }
 
   /**
-   * 화면 렌더링
+   * Render the page
    */
   return (
     <PlanningLayout
-      title="2. What travel style do you prefer?"
+      title={`2. ${title}`}
       currentStep={2}
       isNextDisabled={!selectedOption}
     >
-      {/* 옵션 선택 영역 */}
+      {/* Option selection area */}
       <div className="flex flex-col items-center justify-between w-full gap-4 md:flex-row">
         {travelStyleData.options?.map((option, index) => (
           <SelectionItem
