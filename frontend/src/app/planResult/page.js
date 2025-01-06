@@ -7,9 +7,6 @@ import { useSearchParams } from "next/navigation";
 import LoadingScreen from "@/components/LoadingScreen";
 import DestinationCard from "@/components/DestinationCard";
 
-/**
- * 🔹 PlanResultContent 컴포넌트 (실제 로직 포함)
- */
 function PlanResultContent() {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -17,9 +14,6 @@ function PlanResultContent() {
   const searchParams = useSearchParams();
   const documentId = searchParams?.get("id");
 
-  /**
-   * Firestore에서 사용자 데이터 가져오기
-   */
   useEffect(() => {
     const fetchUserData = async () => {
       if (!documentId) {
@@ -39,12 +33,13 @@ function PlanResultContent() {
         }
       } catch (error) {
         console.error("Error fetching user data:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchUserData();
   }, [documentId]);
-
 
   useEffect(() => {
     const fetchAIResult = async () => {
@@ -52,13 +47,11 @@ function PlanResultContent() {
 
       try {
         const response = await fetch(
-          "https://hackathon-web-4ov5.onrender.com/api/chat",
+          "https://hackathon-glnw.onrender.com/api/chat",
           {
             method: "POST",
-            mode: "cors",
             headers: {
               "Content-Type": "application/json",
-              "Allow-Control-Allow-Origin": "hackathon-six-woad.vercel.app",
             },
             body: JSON.stringify({ docID: documentId }),
           }
@@ -116,13 +109,10 @@ function PlanResultContent() {
           />
         ))}
       </div>
-          </div>
+    </div>
   );
 }
 
-/**
- * 🔹 Suspense로 PlanResultContent 감싸기
- */
 export default function PlanResult() {
   return (
     <Suspense fallback={<LoadingScreen />}>
