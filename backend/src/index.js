@@ -2,21 +2,17 @@ const express = require("express");
 const cors = require("cors");
 const userRoute = require("./UserRoute");
 
+app.use(cors());
 const app = express();
 
 app.use(
-  cors({
+  cors({// Add necessary headers
     origin: [
-      "https://hackathon-six-woad.vercel.app",
-      "http://localhost:3000" // Add localhost for development
+      "https://hackathon-six-woad.vercel.app" ,
+      "http://localhost:3000"
     ],
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Add all necessary methods
-    allowedHeaders: ["Content-Type", "Authorization"], // Add necessary headers
-    // origin: [
-    //   "https://hackathon-six-woad.vercel.app" ,
-    // ],
-    // methods: ["GET", "POST"],
-    // credentials: true,
+    methods: ["GET", "POST"],
+    credentials: true,
   })
 );
 
