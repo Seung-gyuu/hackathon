@@ -45,21 +45,20 @@ function PlanResultContent() {
     fetchUserData();
   }, [documentId]);
 
-  /**
-   * AI API에서 결과 가져오기
-   */
+
   useEffect(() => {
     const fetchAIResult = async () => {
       if (!documentId) return;
 
       try {
         const response = await fetch(
-          "https://hackathon-web-4ov5.onrender.com/api/chat" || "http://localhost:3001/api/chat",
+          "https://hackathon-web-4ov5.onrender.com/api/chat",
           {
             method: "POST",
             mode: "cors",
             headers: {
               "Content-Type": "application/json",
+              "Allow-Control-Allow-Origin": "hackathon-six-woad.vercel.app",
             },
             body: JSON.stringify({ docID: documentId }),
           }
