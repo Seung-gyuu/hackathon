@@ -7,15 +7,22 @@ const app = express();
 app.use(
   cors({
     origin: [
-      "https://hackathon-six-woad.vercel.app" ,
+      "https://hackathon-six-woad.vercel.app",
+      "http://localhost:3000" // Add localhost for development
     ],
-    methods: ["GET", "POST"],
-    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Add all necessary methods
+    allowedHeaders: ["Content-Type", "Authorization"], // Add necessary headers
+    // origin: [
+    //   "https://hackathon-six-woad.vercel.app" ,
+    // ],
+    // methods: ["GET", "POST"],
+    // credentials: true,
   })
 );
 
 app.use(express.json());
 app.use("/api", userRoute);
+
 
 
 
