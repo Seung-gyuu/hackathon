@@ -1,4 +1,5 @@
 "use client";
+
 import PlanningLayout from "@/components/PlanningLayout";
 import SelectionItem from "@/components/SelectionItem";
 import { useEffect, useState } from "react";
@@ -9,16 +10,7 @@ import BasicLoading from "@/components/basicLoading";
 export default function Companion() {
   const [companionData, setCompanionData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [selectedOption, setSelectedOption] = useState(
-    () => localStorage.getItem("selectedCompanion") || null
-  );
-
-  const imgs = [
-    "/img/plan/solo-removebg-preview.png",
-    "/img/plan/family-removebg-preview.png",
-    "/img/plan/friends-removebg-preview.png",
-    "/img/plan/partner-removebg-preview.png",
-  ];
+  const [selectedOption, setSelectedOption] = useState(null);
 
   useEffect(() => {
     const fetchCompanionData = async () => {
@@ -35,20 +27,25 @@ export default function Companion() {
         console.error("Error fetching Companion data:", error);
       } finally {
         setLoading(false);
-        // setTimeout(() => setLoading(false), 1000);
       }
     };
 
     fetchCompanionData();
+
+    // localStorage 값 읽기
+    if (typeof window !== "undefined") {
+      const storedOption = localStorage.getItem("selectedCompanion");
+      setSelectedOption(storedOption || null);
+    }
   }, []);
 
   const handleSelectOption = (option) => {
     setSelectedOption(option);
-    localStorage.setItem("selectedCompanion", option);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("selectedCompanion", option);
+    }
     console.log(`Selected: ${option}`);
   };
-
-  console.log("companionData", companionData);
 
   if (loading) {
     return <BasicLoading />;
@@ -69,8 +66,7 @@ export default function Companion() {
           <SelectionItem
             key={index}
             title={option}
-            img={imgs[index]}
-            isSelected={selectedOption === option ? true : false}
+            isSelected={selectedOption === option}
             onSelect={() => handleSelectOption(option)}
           />
         ))}

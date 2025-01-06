@@ -1,18 +1,16 @@
 "use client";
+
 import PlanningLayout from "@/components/PlanningLayout";
 import SelectionItem from "@/components/SelectionItem";
 import { useEffect, useState } from "react";
 import { db } from "@/firebase";
 import { doc, getDoc } from "firebase/firestore";
 import BasicLoading from "@/components/basicLoading";
-// import { styleData } from "@/data/planningData";
 
 export default function Type() {
   const [travelStyleData, setTravelStyleData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [selectedOption, setSelectedOption] = useState(
-    () => localStorage.getItem("selectedTravelStyle") || null
-  );
+  const [selectedOption, setSelectedOption] = useState(null);
 
   const icons = [
     "/images/plan-2-1.png",
@@ -20,6 +18,17 @@ export default function Type() {
     "/images/plan-2-3.png",
   ];
 
+  // ✅ SSR-safe localStorage 초기화
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const storedOption = localStorage.getItem("selectedStyle");
+      if (storedOption) {
+        setSelectedOption(storedOption);
+      }
+    }
+  }, []);
+
+  // ✅ Firestore에서 데이터 가져오기
   useEffect(() => {
     const fetchTravelStyleData = async () => {
       try {
@@ -35,20 +44,22 @@ export default function Type() {
         console.error("Error fetching travel style data:", error);
       } finally {
         setLoading(false);
-        // setTimeout(() => setLoading(false), 1000);
       }
     };
 
     fetchTravelStyleData();
   }, []);
 
+  // ✅ 옵션 선택 핸들러
   const handleSelectOption = (option) => {
     setSelectedOption(option);
-    localStorage.setItem("selectedStyle", option);
-    console.log(`Selected: ${option}`);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("selectedStyle", option);
+    }
   };
 
   console.log("travelStyleData", travelStyleData);
+  console.log("selectedOption", selectedOption);
 
   if (loading) {
     return <BasicLoading />;
@@ -70,7 +81,7 @@ export default function Type() {
             key={index}
             title={option}
             icon={icons[index]}
-            isSelected={selectedOption === option ? true : false}
+            isSelected={selectedOption === option}
             onSelect={() => handleSelectOption(option)}
           />
         ))}

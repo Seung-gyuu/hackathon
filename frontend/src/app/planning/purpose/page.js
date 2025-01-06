@@ -1,4 +1,5 @@
 "use client";
+
 import PlanningLayout from "@/components/PlanningLayout";
 import SelectionItem from "@/components/SelectionItem";
 import { useEffect, useState } from "react";
@@ -9,9 +10,7 @@ import BasicLoading from "@/components/basicLoading";
 export default function Purpose() {
   const [purposeData, setPurposeData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [selectedOption, setSelectedOption] = useState(
-    () => localStorage.getItem("selectedPurpose") || null
-  );
+  const [selectedOption, setSelectedOption] = useState(null);
 
   const imgs = [
     "/images/plan-1-1.png",
@@ -20,6 +19,17 @@ export default function Purpose() {
     "/images/plan-1-4.png",
   ];
 
+  // ✅ SSR-safe localStorage 초기화
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const storedOption = localStorage.getItem("selectedPurpose");
+      if (storedOption) {
+        setSelectedOption(storedOption);
+      }
+    }
+  }, []);
+
+  // ✅ Firestore에서 데이터 가져오기
   useEffect(() => {
     const fetchPurposeData = async () => {
       try {
@@ -35,17 +45,18 @@ export default function Purpose() {
         console.error("Error fetching purpose data:", error);
       } finally {
         setLoading(false);
-        // setTimeout(() => setLoading(false), 1000);
       }
     };
 
     fetchPurposeData();
   }, []);
 
+  // ✅ 옵션 선택 핸들러
   const handleSelectOption = (option) => {
     setSelectedOption(option);
-    localStorage.setItem("selectedPurpose", option);
-    // console.log(`Selected: ${option}`);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("selectedPurpose", option);
+    }
   };
 
   console.log("purposeData", purposeData);
@@ -58,8 +69,8 @@ export default function Purpose() {
   if (!purposeData) {
     return <p>No data available</p>;
   }
+
   return (
-    // <div className="flex items-center justify-center h-screen">
     <PlanningLayout
       title="1. What is the purpose of your trip?"
       currentStep={1}
@@ -71,12 +82,11 @@ export default function Purpose() {
             key={index}
             title={option}
             img={imgs[index]}
-            isSelected={selectedOption === option ? true : false}
+            isSelected={selectedOption === option}
             onSelect={() => handleSelectOption(option)}
           />
         ))}
       </div>
     </PlanningLayout>
-    // </div>
   );
 }

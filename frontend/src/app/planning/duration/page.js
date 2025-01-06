@@ -1,4 +1,5 @@
 "use client";
+
 import PlanningLayout from "@/components/PlanningLayout";
 import SelectionItem from "@/components/SelectionItem";
 import { useEffect, useState } from "react";
@@ -9,15 +10,7 @@ import BasicLoading from "@/components/basicLoading";
 export default function Duration() {
   const [durationData, setDurationData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [selectedOption, setSelectedOption] = useState(
-    () => localStorage.getItem("selectedDuration") || null
-  );
-
-  const icons = [
-    "/img/plan/short-removebg-preview.png",
-    "/img/plan/medium-removebg-preview.png",
-    "/img/plan/long-removebg-preview.png",
-  ];
+  const [selectedOption, setSelectedOption] = useState(null);
 
   useEffect(() => {
     const fetchDurationData = async () => {
@@ -34,20 +27,24 @@ export default function Duration() {
         console.error("Error fetching Duration data:", error);
       } finally {
         setLoading(false);
-        // setTimeout(() => setLoading(false), 1000);
       }
     };
 
     fetchDurationData();
+
+    if (typeof window !== "undefined") {
+      const storedOption = localStorage.getItem("selectedDuration");
+      setSelectedOption(storedOption || null);
+    }
   }, []);
 
   const handleSelectOption = (option) => {
     setSelectedOption(option);
-    localStorage.setItem("selectedDuration", option);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("selectedDuration", option);
+    }
     console.log(`Selected: ${option}`);
   };
-
-  console.log("durationData", durationData);
 
   if (loading) {
     return <BasicLoading />;
@@ -68,8 +65,7 @@ export default function Duration() {
           <SelectionItem
             key={index}
             title={option}
-            icon={icons[index]}
-            isSelected={selectedOption === option ? true : false}
+            isSelected={selectedOption === option}
             onSelect={() => handleSelectOption(option)}
           />
         ))}

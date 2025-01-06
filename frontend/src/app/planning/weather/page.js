@@ -1,4 +1,5 @@
 "use client";
+
 import PlanningLayout from "@/components/PlanningLayout";
 import SelectionItem from "@/components/SelectionItem";
 import { useEffect, useState } from "react";
@@ -9,15 +10,7 @@ import BasicLoading from "@/components/basicLoading";
 export default function Weather() {
   const [weatherData, setWeatherData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [selectedOption, setSelectedOption] = useState(
-    () => localStorage.getItem("selectedWeather ") || null
-  );
-
-  const icons = [
-    "/img/plan/spring-removebg-preview.png",
-    "/img/plan/summer-removebg-preview.png",
-    "/img/plan/winter-removebg-preview.png",
-  ];
+  const [selectedOption, setSelectedOption] = useState(null);
 
   useEffect(() => {
     const fetchWeatherData = async () => {
@@ -31,23 +24,27 @@ export default function Weather() {
           console.error("No such document!");
         }
       } catch (error) {
-        console.error("Error fetching weather data:", error);
+        console.error("Error fetching Weather data:", error);
       } finally {
         setLoading(false);
-        // setTimeout(() => setLoading(false), 1000);
       }
     };
 
     fetchWeatherData();
+
+    if (typeof window !== "undefined") {
+      const storedOption = localStorage.getItem("selectedWeather");
+      setSelectedOption(storedOption || null);
+    }
   }, []);
 
   const handleSelectOption = (option) => {
     setSelectedOption(option);
-    localStorage.setItem("selectedWeather", option);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("selectedWeather", option);
+    }
     console.log(`Selected: ${option}`);
   };
-
-  console.log("weatherData", weatherData);
 
   if (loading) {
     return <BasicLoading />;
@@ -56,6 +53,7 @@ export default function Weather() {
   if (!weatherData) {
     return <p>No data available</p>;
   }
+
   return (
     <PlanningLayout
       title="3. Select Your Preferred Weather"
@@ -66,9 +64,8 @@ export default function Weather() {
         {weatherData.options?.map((option, index) => (
           <SelectionItem
             key={index}
-            icon={icons[index]}
             title={option}
-            isSelected={selectedOption === option ? true : false}
+            isSelected={selectedOption === option}
             onSelect={() => handleSelectOption(option)}
           />
         ))}

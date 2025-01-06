@@ -1,23 +1,27 @@
-"use client";
+"use client"; // 클라이언트 컴포넌트임을 명시
+
 import PlanningLayout from "@/components/PlanningLayout";
 import SelectionItem from "@/components/SelectionItem";
 import { useEffect, useState } from "react";
 import { db } from "@/firebase";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, addDoc, collection } from "firebase/firestore";
+import { useRouter } from "next/navigation";
 import BasicLoading from "@/components/basicLoading";
 
 export default function Budget() {
   const [budgetData, setBudgetData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [selectedOption, setSelectedOption] = useState(
-    () => localStorage.getItem("selectedBudget") || null
-  );
+  const [selectedOption, setSelectedOption] = useState(null);
 
-  const icons = [
-    "/img/plan/money1-removebg-preview.png",
-    "/img/plan/money2-removebg-preview.png",
-    "/img/plan/money3-removebg-preview.png",
-  ];
+  const router = useRouter();
+
+  // 브라우저 환경에서 localStorage 초기화
+  useEffect(() => {
+    const savedBudget = typeof window !== "undefined"
+      ? localStorage.getItem("selectedBudget")
+      : null;
+    setSelectedOption(savedBudget);
+  }, []);
 
   useEffect(() => {
     const fetchBudgetData = async () => {
@@ -34,7 +38,6 @@ export default function Budget() {
         console.error("Error fetching Budget data:", error);
       } finally {
         setLoading(false);
-        // setTimeout(() => setLoading(false), 1000);
       }
     };
 
@@ -43,11 +46,55 @@ export default function Budget() {
 
   const handleSelectOption = (option) => {
     setSelectedOption(option);
-    localStorage.setItem("selectedBudget", option);
-    console.log(`Selected: ${option}`);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("selectedBudget", option);
+    }
   };
 
-  console.log("budgetData", budgetData);
+  const handleSaveToFirestore = async () => {
+    try {
+      const userSelections = {
+        travel_purpose: typeof window !== "undefined" ? localStorage.getItem("selectedPurpose") : null,
+        travel_style: typeof window !== "undefined" ? localStorage.getItem("selectedStyle") : null,
+        activities: typeof window !== "undefined" ? localStorage.getItem("selectedActivity") : null,
+        budget: typeof window !== "undefined" ? localStorage.getItem("selectedBudget") : null,
+        climate: typeof window !== "undefined" ? localStorage.getItem("selectedWeather") : null,
+        companion: typeof window !== "undefined" ? localStorage.getItem("selectedCompanion") : null,
+        travel_duration: typeof window !== "undefined" ? localStorage.getItem("selectedDuration") : null,
+        createdAt: new Date().toISOString(),
+      };
+
+      const filteredSelections = Object.fromEntries(
+        Object.entries(userSelections).filter(([_, value]) => value !== null)
+      );
+
+      const docRef = await addDoc(
+        collection(db, "user_selections"),
+        filteredSelections
+      );
+
+      console.log("Document written with ID: ", docRef.id);
+
+      if (typeof window !== "undefined") {
+        [
+          "selectedPurpose",
+          "selectedStyle",
+          "selectedActivity",
+          "selectedBudget",
+          "selectedWeather",
+          "selectedCompanion",
+          "selectedDuration",
+        ].forEach((key) => localStorage.removeItem(key));
+      }
+
+      console.log("Local storage cleared after successful save.");
+
+      router.push(`/planResult?id=${docRef.id}`);
+    } catch (error) {
+      console.error("Error saving data to Firestore:", error);
+      alert("Failed to save data. Please try again.");
+    }
+  };
 
   if (loading) {
     return <BasicLoading />;
@@ -59,20 +106,38 @@ export default function Budget() {
 
   return (
     <PlanningLayout
-      title="4. Select Your Budget Range"
-      currentStep={4}
-      isNextDisabled={!selectedOption}
+      title="Select Your Budget"
+      currentStep={6}
+      isFinal={false}
     >
-      <div className="flex flex-col items-center justify-between w-full gap-4 md:flex-row">
-        {budgetData.options?.map((option, index) => (
+      <div className="grid items-center justify-between w-full grid-cols-2 gap-4 md:h-48 md:flex md:flex-row">
+        {budgetData?.options?.map((option, index) => (
           <SelectionItem
             key={index}
             title={option}
-            icon={icons[index]}
-            isSelected={selectedOption === option ? true : false}
+            isSelected={selectedOption === option}
             onSelect={() => handleSelectOption(option)}
           />
         ))}
+      </div>
+
+      <div className="flex justify-between w-full gap-4 mt-8">
+        <div className="flex items-center justify-between w-full gap-4 font-semibold">
+          <button
+            className="px-8 py-2 border-2 rounded-full cursor-pointer text-neutralDarkLight border-neutralDarkLight hover:border-neutralDark hover:text-neutralDark"
+            onClick={() => router.push("/planning/climate")}
+          >
+            Back
+          </button>
+
+          <button
+            className="px-8 py-2 border-2 rounded-full cursor-pointer hover:bg-third border-third/80 bg-third/80 text-neutralLight"
+            onClick={handleSaveToFirestore}
+            disabled={!selectedOption}
+          >
+            Next
+          </button>
+        </div>
       </div>
     </PlanningLayout>
   );
