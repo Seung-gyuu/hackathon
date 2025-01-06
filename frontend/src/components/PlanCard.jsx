@@ -16,12 +16,12 @@ export default function PlanCard({
         w-64 h-96 rounded-3xl ${showCursor ? "cursor-pointer" : ""}
         flex flex-col justify-between
         transition-all duration-300 ease-in-out
-        hover:-translate-y-2 hover:shadow-xl
+        hover:-translate-y-2 hover:shadow-xl border-2 border-gray-400
         
         ${
           isSelected
             ? "bg-gradient-to-b from-orange-400 bg-primary text-white"
-            : "bg-gradient-to-b bg-neutralDarkLight text-gray-700"
+            : "bg-gradient-to-b bg-white text-gray-700 hover:bg-gradient-to-b hover:from-orange-400 hover:bg-primary hover:text-white"
         }
       `}
     >
@@ -42,16 +42,31 @@ export default function PlanCard({
             />
           )}
         </div>
-        <p className="text-md text-center opacity-80 -mt-12">
-          {imageSrc?.src.includes("relax") && "Perfect time for healing"}
-          {imageSrc?.src.includes("foody") && "Discover amazing local cuisine"}
-          {imageSrc?.src.includes("shopping") && "Experience shopping paradise"}
-          {imageSrc?.src.includes("activity") && "Exciting adventures await"}
+        <p className="text-md text-center -mt-12">
+          {imageSrc?.src.includes("relax")
+            ? "Perfect time for healing"
+            : imageSrc?.src.includes("foody")
+            ? "Discover amazing local cuisine"
+            : imageSrc?.src.includes("shopping")
+            ? "Experience shopping paradise"
+            : imageSrc?.src.includes("activity")
+            ? "Exciting adventures await"
+            : imageSrc?.src.includes("breakfast")
+            ? "Start your day with breakfast"
+            : imageSrc?.src.includes("dinner")
+            ? "Enjoy fine dining experience"
+            : imageSrc?.src.includes("hotspring")
+            ? "Relax in natural hot springs"
+            : imageSrc?.src.includes("summer")
+            ? "Enjoy summer activities"
+            : imageSrc?.src.includes("winter")
+            ? "Experience winter wonderland"
+            : ""}
         </p>
       </div>
 
-      <div className="flex items-center justify-between w-full p-4 border-t border-gray-400">
-        <span className="text-md">✨</span>
+      <div className="flex items-center justify-between w-full p-4 border-t border-gray-500">
+        <span className="text-sm">✨</span>
       </div>
     </div>
   );

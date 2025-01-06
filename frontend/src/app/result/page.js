@@ -1,3 +1,5 @@
+// 사실상 사용안하는듯? 한번더 체크. random result는 ResultModal이라는 컴포넌트에 있음음
+
 "use client";
 import { useState, useEffect } from "react";
 import PlanCard from "@/components/PlanCard";
@@ -16,7 +18,7 @@ const originalImages = [
   winterImage,
 ];
 
-export default function page() {
+export default function Result() {
   const [selectedBox, setSelectedBox] = useState(null);
   const [shuffledImages, setShuffledImages] = useState(
     originalImages.slice(0, 3)
@@ -73,4 +75,3 @@ export default function page() {
     </div>
   );
 }
-
