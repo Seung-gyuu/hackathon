@@ -13,6 +13,12 @@ export default function Weather() {
     () => localStorage.getItem("selectedWeather ") || null
   );
 
+  const icons = [
+    "/img/plan/spring-removebg-preview.png",
+    "/img/plan/summer-removebg-preview.png",
+    "/img/plan/winter-removebg-preview.png",
+  ];
+
   useEffect(() => {
     const fetchWeatherData = async () => {
       try {
@@ -60,6 +66,7 @@ export default function Weather() {
         {weatherData.options?.map((option, index) => (
           <SelectionItem
             key={index}
+            icon={icons[index]}
             title={option}
             isSelected={selectedOption === option ? true : false}
             onSelect={() => handleSelectOption(option)}

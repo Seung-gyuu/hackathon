@@ -42,9 +42,34 @@ const getAIResponse = async (docID) => {
 
         {
           role: "system",
-          content:
-            "You are a travel assistant AI. Based on the user preferences, recommend three destinations with a one-day itinerary each. Provide the result in JSON format, structured as an array of destinations, where each destination includes a name, a one-day itinerary, and activities for morning, lunch, afternoon, and evening.",
-          //     "Based on the following user preferences, recommend three countries or cities with a 1-day itinerary for each destination. Please add React tags to this text.",
+          content: `
+You are a travel assistant AI. Based on the user preferences, recommend three travel destinations. For each destination:
+1. Suggest a travel itinerary tailored to the user's travel duration. 
+2. If the duration is more than one day, provide a detailed day-by-day plan.
+3. Include morning, lunch, afternoon, and evening activities for each day.
+4. Ensure the recommendations align with the user's purpose, style, budget, and selected activities.
+
+Return the result in the following JSON format:
+
+[
+  {
+    "name": "Destination Name",
+    "duration": "Recommended Duration (e.g., 3 days, 7 days)",
+    "itinerary": {
+      "day1": {
+        "morning": "Morning activity description",
+        "lunch": "Lunch recommendation",
+        "afternoon": "Afternoon activity description",
+        "evening": "Evening activity description"
+      },
+      "day2": { ... },
+      "day3": { ... },
+    "...": { ... }
+    },
+    "activities": ["activity1", "activity2", "activity3"],
+  }
+]
+          `,
         },
       ],
     });
