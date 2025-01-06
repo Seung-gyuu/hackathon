@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const userRoute = require("./UserRoute");
+const { getAIResponse } = require("./aiController");
 
 const app = express();
 
@@ -25,7 +26,7 @@ app.post('/api/chat', async (req, res) => {
   }
 
   try {
-    const aiResponse = await getAIResponse(docID);
+    const aiResponse = await aiController(docID);
     res.json({ result: aiResponse });
   } catch (error) {
     console.error('Error handling /api/chat request:', error);
