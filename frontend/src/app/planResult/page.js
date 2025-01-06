@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { db } from "@/firebase";
 import { doc, getDoc } from "firebase/firestore";
 import { useSearchParams } from "next/navigation";
@@ -8,15 +8,18 @@ import LoadingScreen from "@/components/LoadingScreen";
 import DestinationCard from "@/components/DestinationCard";
 import HomeButton from "@/components/HomeButton";
 
-export default function PlanResult() {
+/**
+ * 🔹 PlanResultContent 컴포넌트 (실제 로직 포함)
+ */
+function PlanResultContent() {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [result, setResult] = useState([]);
   const searchParams = useSearchParams();
-  const documentId = searchParams.get("id");
+  const documentId = searchParams?.get("id");
 
   /**
-   * 🔹 Firestore에서 사용자 데이터 가져오기
+   * Firestore에서 사용자 데이터 가져오기
    */
   useEffect(() => {
     const fetchUserData = async () => {
@@ -44,7 +47,7 @@ export default function PlanResult() {
   }, [documentId]);
 
   /**
-   * 🔹 AI API에서 여행 결과 가져오기
+   * AI API에서 결과 가져오기
    */
   useEffect(() => {
     const fetchAIResult = async () => {
@@ -89,19 +92,10 @@ export default function PlanResult() {
     fetchAIResult();
   }, [documentId]);
 
-  console.log("Result:", result);
-  console.log("User Data:", userData);
-
-  /**
-   * 🔹 로딩 상태
-   */
   if (loading) {
     return <LoadingScreen />;
   }
 
-  /**
-   * 🔹 데이터가 없을 경우
-   */
   if (!userData || result.length === 0) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -110,9 +104,6 @@ export default function PlanResult() {
     );
   }
 
-  /**
-   * 🔹 최종 UI 렌더링
-   */
   return (
     <div className="flex flex-col items-center justify-center flex-1 h-[calc(100vh-8rem)] container">
       <div className="grid items-center justify-center w-full grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -127,5 +118,16 @@ export default function PlanResult() {
         ))}
       </div>
           </div>
+  );
+}
+
+/**
+ * 🔹 Suspense로 PlanResultContent 감싸기
+ */
+export default function PlanResult() {
+  return (
+    <Suspense fallback={<LoadingScreen />}>
+      <PlanResultContent />
+    </Suspense>
   );
 }
