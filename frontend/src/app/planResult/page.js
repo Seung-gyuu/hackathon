@@ -1,18 +1,20 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { db } from "@/firebase";
 import { doc, getDoc } from "firebase/firestore";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import LoadingScreen from "@/components/LoadingScreen";
 import DestinationCard from "@/components/DestinationCard";
-import HomeButton from "@/components/HomeButton";
-export default function PlanResult() {
+
+function PlanResultContent() {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [result, setResult] = useState([]);
   const searchParams = useSearchParams();
+  const router = useRouter();
   const documentId = searchParams.get("id");
 
+  // Firestore에서 사용자 데이터 가져오기
   useEffect(() => {
     const fetchResult = async () => {
       try {
@@ -37,6 +39,7 @@ export default function PlanResult() {
     fetchResult();
   }, [documentId]);
 
+  // AI API에서 결과 가져오기
   useEffect(() => {
     const fetchResult = async () => {
       try {
@@ -103,9 +106,21 @@ export default function PlanResult() {
           />
         ))}
       </div>
-      <div className="flex justify-center w-full mt-8">
-        <HomeButton />
-      </div>
+      <button
+        className="px-8 py-2 border-2 rounded-full cursor-pointer hover:bg-third border-third/80 bg-third/80 text-neutralLight mt-4"
+        onClick={() => router.push("/")}
+      >
+        Go Home
+      </button>
     </div>
+  );
+}
+
+// Suspense로 감싸기
+export default function PlanResult() {
+  return (
+    <Suspense fallback={<LoadingScreen />}>
+      <PlanResultContent />
+    </Suspense>
   );
 }
