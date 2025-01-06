@@ -18,16 +18,23 @@ app.use(
 app.use(express.json());
 app.use("/api", userRoute);
 
-app.post("/api/chat", (req, res) => {
-  // Your chat logic here
-  res.json({ message: "CORS issue fixed!" });
+
+//
+app.post("/test", (req, res) => {
+  console.log("POST /test 요청 받음");
+  console.log("Request body:", req.body); // 요청 본문 출력
+
+  // 클라이언트로 응답 보내기
+  res.json({
+    message: "Received data successfully!",
+    data: req.body
+  });
 });
-
-
+//
 
 module.exports = app;
 
-// const PORT = process.env.PORT || 3001;
-// app.listen(PORT, () => {
-//   console.log(`Server running on http://localhost:${PORT}`);
-// })
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
+})
