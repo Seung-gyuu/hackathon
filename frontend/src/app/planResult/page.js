@@ -54,7 +54,7 @@ function PlanResultContent() {
 
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/chat`,
+          `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}/api/chat`,
           {
             method: "POST",
             headers: {
@@ -134,9 +134,6 @@ function PlanResultContent() {
             activities={destination.activities || []}
           />
         ))}
-      </div>
-      <div className="flex justify-center w-full mt-8">
-        <HomeButton />
       </div>
     </div>
   );
